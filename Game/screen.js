@@ -73,28 +73,20 @@ define(["gameOptions", "player"
 
                 self.player.create().restart();
 
+                self.move_e = undefined;
+                game.input.onUp.add(function(e){
+                    if (self.move_e == undefined) return;
+                    self.move_e = undefined;
+                });
+
+                game.input.onHold.add(function(e){
+                    if (self.move_e != undefined) return;
+                    self.move_e = e;
+                });
+
                 game.input.onDown.add(function(e){
-                    var self = this;
-                    var dx = e.x - self.player.sprite.worldPosition.x;
-                    var dy = e.y - self.player.sprite.worldPosition.y;
-                    var adx = Math.abs(dx);
-                    var ady = Math.abs(dy);
-                    if (adx>ady) {
-                        if (dx > 0) {
-                            self.player.right();
-                        }
-                        else {
-                            self.player.left();
-                        }
-                    }
-                    else  {
-                        if (dy > 0) {
-                            self.player.down();
-                        }
-                        else {
-                            self.player.up();
-                        }
-                    }
+                    if (self.move_e != undefined) return;
+                    self.move_e = e;
                 }, self);
 
                 game.input.keyboard.onDownCallback = function (ev) {
@@ -172,6 +164,10 @@ define(["gameOptions", "player"
                 // game.debug.text("self.player.sprite.body.velocity.y=" + self.player.sprite.body.velocity.y, 10, 40);
 
                 if (self._suspended == true) return;
+
+                if (self.move_e != undefined) {
+                    self.player.moveTo(self.move_e.x, self.move_e.y);
+                }
 
                 self.player.updatelevel(self);
                 this.eachenemy(function (enemy) {

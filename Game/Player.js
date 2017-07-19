@@ -30,28 +30,29 @@ define([], function () {
             return self;
         };
 
-        self.startanimation = function() {
+        self.startanimation = function () {
             var vx = self.sprite.body.velocity.x;
             var vy = self.sprite.body.velocity.y;
-            if (vx>0)
+            if (vx > 0)
                 self.sprite.animations.play("right");
-            else if (vx<0)
+            else if (vx < 0)
                 self.sprite.animations.play("left");
-            else if (vy>0)
+            else if (vy > 0)
                 self.sprite.animations.play("down");
-            else if (vy<0)
+            else if (vy < 0)
                 self.sprite.animations.play("up");
             else
                 self.sprite.animations.play("stop");
         };
 
-        self.stopanimation = function() {
+        self.stopanimation = function () {
             self.sprite.animations.stop(null, true);
         };
 
         self.restart = function () {
             self.sprite.x = config.x0;
             self.sprite.y = config.y0;
+            self.up();
             return self;
         }
 
@@ -63,6 +64,7 @@ define([], function () {
         };
 
         self.left = function () {
+            if (self.sprite.body.velocity.x<0) return;
             self.sprite.body.velocity.x = -config.speed;
             self.sprite.body.velocity.y = 0;
             self.startanimation();
@@ -70,6 +72,7 @@ define([], function () {
         };
 
         self.right = function () {
+            if (self.sprite.body.velocity.x > 0) return;
             self.sprite.body.velocity.x = config.speed;
             self.sprite.body.velocity.y = 0;
             self.startanimation();
@@ -77,18 +80,62 @@ define([], function () {
         };
 
         self.up = function () {
+            if (self.sprite.body.velocity.y < 0) return;
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = -config.speed;
             self.startanimation();
             return self;
         };
 
-        
         self.down = function () {
+            if (self.sprite.body.velocity.y > 0) return;
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = config.speed;
             self.startanimation();
             return self;
+        };
+
+        self.moveTo = function(x, y) {
+            var dx = x - self.sprite.worldPosition.x;
+            var dy = y - self.sprite.worldPosition.y;
+            var adx = Math.abs(dx);
+            var ady = Math.abs(dy);
+            if (adx>ady) {
+                if (dx > 0) {
+                    self.right();
+                }
+                else {
+                    self.left();
+                }
+            }
+            else  {
+                if (dy > 0) {
+                    self.down();
+                }
+                else {
+                    self.up();
+                }
+            }
+            // var dx = x - self.sprite.worldPosition.x;
+            // var dy = y - self.sprite.worldPosition.y;
+            // var adx = Math.abs(dx);
+            // var ady = Math.abs(dy);
+            // if (self.sprite.body.velocity.x != 0) {
+            //     if (dx > 0) {
+            //         self.right();
+            //     }
+            //     else {
+            //         self.left();
+            //     }
+            // }
+            // else if (self.sprite.body.velocity.y != 0)  {
+            //     if (dy > 0) {
+            //         self.down();
+            //     }
+            //     else {
+            //         self.up();
+            //     }
+            // }
         };
 
         self.stop = function () {
