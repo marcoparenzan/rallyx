@@ -14,12 +14,11 @@ requirejs([
 
         var Init = function (game) {
             this.preload = function () {
-                // game.scale.setUserScale(3, 3);
-                game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-
                 game.scale.pageAlignHorizontally = true;
                 game.scale.pageAlignVertically = true;
                 // game.stage.disableVisibilityChange = true;
+                game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+                // game.scale.setScreenSize(true);
 
                 //game.load.audio('default', ['captured.wav']);
             };
@@ -42,15 +41,23 @@ requirejs([
                 game.load.image("title", "assets/title.png");
             };
 
+            this.start = function() {
+                game.state.start("screen");
+            };
+
             this.create = function () {
+                var self = this;
                 game.add.sprite(0, 0, 'title');
+                
+                game.input.onDown.add(function(e){
+                    self.start();
+                }, self);
 
                 // handle keyboard
                 game.input.keyboard.onDownCallback = function (ev) {
                     switch (ev.keyCode) {
                         case 32:
-                        case 38:
-                            game.state.start("screen");
+                            self.start();
                             break;
                     }
                 };

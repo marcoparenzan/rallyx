@@ -95,30 +95,30 @@ define(["gameOptions", "player"
                             self.player.up();
                         }
                     }
-                }, this);
+                }, self);
 
-                // game.input.keyboard.onDownCallback = function (ev) {
-                //     switch (ev.keyCode) {
-                //         case 37:
-                //             self.player.left();
-                //             break;
-                //         case 38:
-                //             self.player.up();
-                //             break;
-                //         case 39:
-                //             self.player.right();
-                //             break;
-                //         case 40:
-                //             self.player.down();
-                //             break;
-                //     }
-                // };
-                // game.input.keyboard.onUpCallback = function (ev) {
-                //     switch (ev.keyCode) {
-                //         default:
-                //         break;
-                //     }
-                // };
+                game.input.keyboard.onDownCallback = function (ev) {
+                    switch (ev.keyCode) {
+                        case 37:
+                            self.player.left();
+                            break;
+                        case 38:
+                            self.player.up();
+                            break;
+                        case 39:
+                            self.player.right();
+                            break;
+                        case 40:
+                            self.player.down();
+                            break;
+                    }
+                };
+                game.input.keyboard.onUpCallback = function (ev) {
+                    switch (ev.keyCode) {
+                        default:
+                        break;
+                    }
+                };
 
                 this.eachenemy(function (enemy) {
                     enemy.create().restart();
