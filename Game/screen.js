@@ -73,28 +73,52 @@ define(["gameOptions", "player"
 
                 self.player.create().restart();
 
-                game.input.keyboard.onDownCallback = function (ev) {
-                    switch (ev.keyCode) {
-                        case 37:
-                            self.player.left();
-                            break;
-                        case 38:
-                            self.player.up();
-                            break;
-                        case 39:
+                game.input.onDown.add(function(e){
+                    var self = this;
+                    var dx = e.x - self.player.sprite.worldPosition.x;
+                    var dy = e.y - self.player.sprite.worldPosition.y;
+                    var adx = Math.abs(dx);
+                    var ady = Math.abs(dy);
+                    if (adx>ady) {
+                        if (dx > 0) {
                             self.player.right();
-                            break;
-                        case 40:
+                        }
+                        else {
+                            self.player.left();
+                        }
+                    }
+                    else  {
+                        if (dy > 0) {
                             self.player.down();
-                            break;
+                        }
+                        else {
+                            self.player.up();
+                        }
                     }
-                };
-                game.input.keyboard.onUpCallback = function (ev) {
-                    switch (ev.keyCode) {
-                        default:
-                        break;
-                    }
-                };
+                }, this);
+
+                // game.input.keyboard.onDownCallback = function (ev) {
+                //     switch (ev.keyCode) {
+                //         case 37:
+                //             self.player.left();
+                //             break;
+                //         case 38:
+                //             self.player.up();
+                //             break;
+                //         case 39:
+                //             self.player.right();
+                //             break;
+                //         case 40:
+                //             self.player.down();
+                //             break;
+                //     }
+                // };
+                // game.input.keyboard.onUpCallback = function (ev) {
+                //     switch (ev.keyCode) {
+                //         default:
+                //         break;
+                //     }
+                // };
 
                 this.eachenemy(function (enemy) {
                     enemy.create().restart();
