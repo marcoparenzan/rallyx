@@ -16,7 +16,7 @@ define(["gameOptions", "player"
                 this.player.preload();
 
                 this.enemies = {};
-                this.eachenemy = function (callback) {
+                this.foreachenemy = function (callback) {
                     var keys = Object.keys(this.enemies);
                     for (var i = 0; i < keys.length; i++) {
                         callback(this.enemies[keys[i]]);
@@ -74,17 +74,17 @@ define(["gameOptions", "player"
                 self.player.create().restart();
 
                 self.move_e = undefined;
-                game.input.onUp.add(function(e){
+                game.input.onUp.add(function (e) {
                     if (self.move_e == undefined) return;
                     self.move_e = undefined;
                 });
 
-                game.input.onHold.add(function(e){
+                game.input.onHold.add(function (e) {
                     if (self.move_e != undefined) return;
                     self.move_e = e;
                 });
 
-                game.input.onDown.add(function(e){
+                game.input.onDown.add(function (e) {
                     if (self.move_e != undefined) return;
                     self.move_e = e;
                 }, self);
@@ -108,19 +108,51 @@ define(["gameOptions", "player"
                 game.input.keyboard.onUpCallback = function (ev) {
                     switch (ev.keyCode) {
                         default:
-                        break;
+                            break;
                     }
                 };
 
-                this.eachenemy(function (enemy) {
+                this.foreachenemy(function (enemy) {
                     enemy.create().restart();
                 });
 
                 // set workd bounds to allow camera to follow the player
-                game.world.setBounds(0, 0, 1008*4, 1536*4);
+                game.world.setBounds(0, 0, 1008 * 4, 1536 * 4);
 
                 // making the camera follow the player
                 game.camera.follow(self.player.sprite, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
+            };
+
+            this.playerCanTurnRight = function (x, y) {
+                var self = this;
+                var tile = this.map.getTileRight(self.map.currentLayer, x, y);
+                if (tile == undefined) return false;
+                if (tile.index > 1) return false;
+                return true;                
+            };
+
+            this.playerCanTurnDown = function (x, y) {
+                var self = this;
+                var tile = this.map.getTileBelow(self.map.currentLayer, x, y);
+                if (tile == undefined) return false;
+                if (tile.index > 1) return false;
+                return true;                
+            };
+
+            this.playerCanTurnLeft = function (x, y) {
+                var self = this;
+                var tile = this.map.getTileLeft(self.map.currentLayer, x, y);
+                if (tile == undefined) return false;
+                if (tile.index > 1) return false;
+                return true;                
+            };
+
+            this.playerCanTurnUp = function (x, y) {
+                var self = this;
+                var tile = this.map.getTileAbove(self.map.currentLayer, x, y);
+                if (tile == undefined) return false;
+                if (tile.index > 1) return false;
+                return true;                
             };
 
             this.playerOnEnemy = function () {
@@ -141,7 +173,7 @@ define(["gameOptions", "player"
                 var self = this;
                 self._suspended = true;
                 self.player.suspend();
-                this.eachenemy(function (enemy) {
+                this.foreachenemy(function (enemy) {
                     enemy.suspend();
                 });
             };
@@ -149,7 +181,7 @@ define(["gameOptions", "player"
             this.restart = function () {
                 var self = this;
                 self.player.restart();
-                this.eachenemy(function (enemy) {
+                this.foreachenemy(function (enemy) {
                     enemy.restart();
                 });
                 self._suspended = false;
@@ -170,7 +202,7 @@ define(["gameOptions", "player"
                 }
 
                 self.player.updatelevel(self);
-                this.eachenemy(function (enemy) {
+                this.foreachenemy(function (enemy) {
                     enemy.updatelevel(self);
                     self.player.updateenemy(enemy, function () {
                         self.playerOnEnemy();

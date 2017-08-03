@@ -152,8 +152,34 @@ define([], function () {
 
         self.updatelevel = function (level) {
             var self = this;
-            game.physics.arcade.collide(self.sprite, level.layer, function (hero, layer) {
-                self.stopanimation();
+            game.physics.arcade.collide(self.sprite, level.layer, function (hero, tile) {
+                if (hero.body.blocked.up == true) {
+                    var x = tile.x; var y = tile.y+1;
+                    if (this.playerCanTurnRight(x, y)) self.right();                        
+                    else if (this.playerCanTurnLeft(x, y)) self.left();
+                    else if (this.playerCanTurnDown(x, y)) self.down();                        
+                }
+                else if (hero.body.blocked.left == true) {
+                    var x = tile.x+1; var y = tile.y;
+                    if (this.playerCanTurnUp(x, y)) self.up();                        
+                    else if (this.playerCanTurnDown(x, y)) self.down();                        
+                    else if (this.playerCanTurnRight(x, y)) self.right();
+                }
+                else if (hero.body.blocked.down == true) {
+                    var x = tile.x; var y = tile.y-1;
+                    if (this.playerCanTurnLeft(x, y)) self.left();
+                    else if (this.playerCanTurnRight(x, y)) self.right();                        
+                    else if (this.playerCanTurnUp(x, y)) self.up();                        
+                }
+                else if (hero.body.blocked.right == true) {
+                    var x = tile.x-1; var y = tile.y;
+                    if (this.playerCanTurnDown(x, y)) self.down();                        
+                    else if (this.playerCanTurnUp(x, y)) self.up();                        
+                    else if (this.playerCanTurnLeft(x, y)) self.left();                        
+                }
+                else {
+                    self.stopanimation();
+                }
             }, null, level);
             return self;
         };
