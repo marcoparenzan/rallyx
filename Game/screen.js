@@ -9,8 +9,8 @@ define(["gameOptions", "player"
                 game.load.image("default", "assets/rallyx-map-tileset.png");
 
                 this.player = new Player(game, {
-                    x0: 15 * 96 + 48,
-                    y0: 15 * 96 + 48,
+                    x0: 20 * 96 + 48,
+                    y0: 54 * 96 + 48,
                     speed: 400
                 });
                 this.player.preload();
@@ -32,28 +32,6 @@ define(["gameOptions", "player"
                 //     y2: 22*8,
                 //     speed: 95,
                 //     mode: "ud"
-                // }).preload();
-
-                // this.enemies["2"] = new Enemy(game, {
-                //     name: "enemy2",
-                //     spriteframesname: "copterside",
-                //     x0: 20*8+12,
-                //     y0: 12*8,
-                //     y1: 12*8,
-                //     y2: 16*8,
-                //     speed: 30,
-                //     mode: "ud"
-                // }).preload();
-
-                // this.enemies["3"] = new Enemy(game, {
-                //     name: "enemy3",
-                //     spriteframesname: "05",
-                //     x0: 23*8+12,
-                //     y0: 20*8,
-                //     x1: 23*8+12,
-                //     x2: 40*8-12,
-                //     speed: 68,
-                //     mode: "lr"
                 // }).preload();
             };
 
@@ -90,24 +68,19 @@ define(["gameOptions", "player"
                 }, self);
 
                 game.input.keyboard.onDownCallback = function (ev) {
+                    var tile = self.getPlayerTile();
                     switch (ev.keyCode) {
                         case 37:
-                            self.player.left();
+                            if (self.playerCanTurnLeft(tile.x, tile.y)) self.player.left();
                             break;
                         case 38:
-                            self.player.up();
+                            if (self.playerCanTurnUp(tile.x, tile.y)) self.player.up();
                             break;
                         case 39:
-                            self.player.right();
+                            if (self.playerCanTurnRight(tile.x, tile.y)) self.player.right();
                             break;
                         case 40:
-                            self.player.down();
-                            break;
-                    }
-                };
-                game.input.keyboard.onUpCallback = function (ev) {
-                    switch (ev.keyCode) {
-                        default:
+                            if (self.playerCanTurnDown(tile.x, tile.y)) self.player.down();
                             break;
                     }
                 };
@@ -121,6 +94,11 @@ define(["gameOptions", "player"
 
                 // making the camera follow the player
                 game.camera.follow(self.player.sprite, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
+            };
+
+            this.getPlayerTile = function() {
+                var self = this;
+                return self.map.getTileWorldXY(self.player.sprite.x, self.player.sprite.y, self.map.tileWidth, self.map.tileHeight, self.layer);
             };
 
             this.playerCanTurnRight = function (x, y) {

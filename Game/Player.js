@@ -43,10 +43,12 @@ define([], function () {
                 self.sprite.animations.play("up");
             else
                 self.sprite.animations.play("stop");
+            return self;
         };
 
         self.stopanimation = function () {
             self.sprite.animations.stop(null, true);
+            return self;
         };
 
         self.restart = function () {
@@ -116,26 +118,7 @@ define([], function () {
                     self.up();
                 }
             }
-            // var dx = x - self.sprite.worldPosition.x;
-            // var dy = y - self.sprite.worldPosition.y;
-            // var adx = Math.abs(dx);
-            // var ady = Math.abs(dy);
-            // if (self.sprite.body.velocity.x != 0) {
-            //     if (dx > 0) {
-            //         self.right();
-            //     }
-            //     else {
-            //         self.left();
-            //     }
-            // }
-            // else if (self.sprite.body.velocity.y != 0)  {
-            //     if (dy > 0) {
-            //         self.down();
-            //     }
-            //     else {
-            //         self.up();
-            //     }
-            // }
+            return self;
         };
 
         self.stop = function () {
@@ -151,7 +134,6 @@ define([], function () {
         };
 
         self.updatelevel = function (level) {
-            var self = this;
             game.physics.arcade.collide(self.sprite, level.layer, function (hero, tile) {
                 if (hero.body.blocked.up == true) {
                     var x = tile.x; var y = tile.y+1;
