@@ -51,16 +51,16 @@ define(["gameOptions", "player"
 
                 self.player.create().restart();
 
-                self.move_e = undefined;
-                game.input.onUp.add(function (e) {
-                    if (self.move_e == undefined) return;
-                    self.move_e = undefined;
-                });
+                // self.move_e = undefined;
+                // game.input.onUp.add(function (e) {
+                //     if (self.move_e == undefined) return;
+                //     self.move_e = undefined;
+                // });
 
-                game.input.onHold.add(function (e) {
-                    if (self.move_e != undefined) return;
-                    self.move_e = e;
-                });
+                // game.input.onHold.add(function (e) {
+                //     if (self.move_e != undefined) return;
+                //     self.move_e = e;
+                // });
 
                 game.input.onDown.add(function (e) {
                     if (self.move_e != undefined) return;
@@ -176,7 +176,7 @@ define(["gameOptions", "player"
                 if (self._suspended == true) return;
 
                 if (self.move_e != undefined) {
-                    self.player.moveTo(self.move_e.x, self.move_e.y);
+                    self.player.moveTo(self, self.move_e.x, self.move_e.y);
                 }
 
                 self.player.updatelevel(self);

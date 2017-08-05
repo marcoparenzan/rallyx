@@ -97,25 +97,27 @@ define([], function () {
             return self;
         };
 
-        self.moveTo = function(x, y) {
+        self.moveTo = function(level, x, y) {
+            var tile = level.getPlayerTile();
+
             var dx = x - self.sprite.worldPosition.x;
             var dy = y - self.sprite.worldPosition.y;
             var adx = Math.abs(dx);
             var ady = Math.abs(dy);
             if (adx>ady) {
                 if (dx > 0) {
-                    self.right();
+                    if (level.playerCanTurnRight(tile.x, tile.y)) self.right();
                 }
                 else {
-                    self.left();
+                    if (level.playerCanTurnLeft(tile.x, tile.y)) self.left();
                 }
             }
             else  {
                 if (dy > 0) {
-                    self.down();
+                    if (level.playerCanTurnDown(tile.x, tile.y)) self.down();
                 }
                 else {
-                    self.up();
+                    if (level.playerCanTurnUp(tile.x, tile.y)) self.up();
                 }
             }
             return self;
