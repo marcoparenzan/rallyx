@@ -51,36 +51,55 @@ define(["gameOptions", "player"
 
                 self.player.create().restart();
 
-                // self.move_e = undefined;
-                // game.input.onUp.add(function (e) {
-                //     if (self.move_e == undefined) return;
-                //     self.move_e = undefined;
-                // });
+                self.targetTile = undefined;
+                game.input.onUp.add(function (e) {
+                    if (self.targetTile == undefined) return;
+                    self.targetTile = undefined;
+                });
 
-                // game.input.onHold.add(function (e) {
-                //     if (self.move_e != undefined) return;
-                //     self.move_e = e;
-                // });
+                game.input.onHold.add(function (e) {
+                    self.targetTile = self.getTile(game.input.worldX, game.input.worldY);
+                });
 
                 game.input.onDown.add(function (e) {
-                    if (self.move_e != undefined) return;
-                    self.move_e = e;
+                    self.targetTile = self.getTile(game.input.worldX, game.input.worldY);
                 }, self);
 
+                self.playerToLeft = false;
+                self.playerToUp = false;
+                self.playerToRight = false;
+                self.playerToDown = false;
+
                 game.input.keyboard.onDownCallback = function (ev) {
-                    var tile = self.getPlayerTile();
                     switch (ev.keyCode) {
                         case 37:
-                            if (self.playerCanTurnLeft(tile.x, tile.y)) self.player.left();
+                            self.playerToLeft = true;
                             break;
                         case 38:
-                            if (self.playerCanTurnUp(tile.x, tile.y)) self.player.up();
+                            self.playerToUp = true;
                             break;
                         case 39:
-                            if (self.playerCanTurnRight(tile.x, tile.y)) self.player.right();
+                            self.playerToRight = true;
                             break;
                         case 40:
-                            if (self.playerCanTurnDown(tile.x, tile.y)) self.player.down();
+                            self.playerToDown = true;
+                            break;
+                    }
+                };
+
+                game.input.keyboard.onUpCallback = function (ev) {
+                    switch (ev.keyCode) {
+                        case 37:
+                            self.playerToLeft = false;
+                            break;
+                        case 38:
+                            self.playerToUp = false;
+                            break;
+                        case 39:
+                            self.playerToRight = false;
+                            break;
+                        case 40:
+                            self.playerToDown = false;
                             break;
                     }
                 };
@@ -96,41 +115,58 @@ define(["gameOptions", "player"
                 game.camera.follow(self.player.sprite, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
             };
 
-            this.getPlayerTile = function() {
+            this.getPlayerTile = function () {
                 var self = this;
-                return self.map.getTileWorldXY(self.player.sprite.x, self.player.sprite.y, self.map.tileWidth, self.map.tileHeight, self.layer);
+                return self.getTile(self.player.sprite.world.x, self.player.sprite.world.y);
             };
 
-            this.playerCanTurnRight = function (x, y) {
+            this.getTile = function (x, y) {
                 var self = this;
-                var tile = this.map.getTileRight(self.map.currentLayer, x, y);
-                if (tile == undefined) return false;
-                if (tile.index > 1) return false;
-                return true;                
+                return self.map.getTileWorldXY(x, y, self.map.tileWidth, self.map.tileHeight, self.layer);
             };
 
-            this.playerCanTurnDown = function (x, y) {
+            this.playerCanTurnRight = function () {
                 var self = this;
-                var tile = this.map.getTileBelow(self.map.currentLayer, x, y);
+                var tile1 = self.getPlayerTile();
+                var tile = self.map.getTileRight(self.map.currentLayer, tile1.x, tile1.y);
                 if (tile == undefined) return false;
                 if (tile.index > 1) return false;
-                return true;                
+                if ((self.player.sprite.y - self.player.sprite.height / 2) < (tile.worldY)) return false;
+                if ((self.player.sprite.y + self.player.sprite.height / 2) > (tile.worldY + tile.height)) return false;
+                return true;
             };
 
-            this.playerCanTurnLeft = function (x, y) {
+            this.playerCanTurnDown = function () {
                 var self = this;
-                var tile = this.map.getTileLeft(self.map.currentLayer, x, y);
+                var tile1 = self.getPlayerTile();
+                var tile = self.map.getTileBelow(self.map.currentLayer, tile1.x, tile1.y);
                 if (tile == undefined) return false;
                 if (tile.index > 1) return false;
-                return true;                
+                if ((self.player.sprite.x - self.player.sprite.width / 2) < (tile.worldX)) return false;
+                if ((self.player.sprite.x + self.player.sprite.width / 2) > (tile.worldX + tile.width)) return false;
+                return true;
             };
 
-            this.playerCanTurnUp = function (x, y) {
+            this.playerCanTurnLeft = function () {
                 var self = this;
-                var tile = this.map.getTileAbove(self.map.currentLayer, x, y);
+                var tile1 = self.getPlayerTile();
+                var tile = self.map.getTileLeft(self.map.currentLayer, tile1.x, tile1.y);
                 if (tile == undefined) return false;
                 if (tile.index > 1) return false;
-                return true;                
+                if ((self.player.sprite.y - self.player.sprite.height / 2) < (tile.worldY)) return false;
+                if ((self.player.sprite.y + self.player.sprite.height / 2) > (tile.worldY + tile.height)) return false;
+                return true;
+            };
+
+            this.playerCanTurnUp = function () {
+                var self = this;
+                var tile1 = self.getPlayerTile();
+                var tile = self.map.getTileAbove(self.map.currentLayer, tile1.x, tile1.y);
+                if (tile == undefined) return false;
+                if (tile.index > 1) return false;
+                if ((self.player.sprite.x - self.player.sprite.width / 2) < (tile.worldX)) return false;
+                if ((self.player.sprite.x + self.player.sprite.width / 2) > (tile.worldX + tile.width)) return false;
+                return true;
             };
 
             this.playerOnEnemy = function () {
@@ -175,17 +211,79 @@ define(["gameOptions", "player"
 
                 if (self._suspended == true) return;
 
-                if (self.move_e != undefined) {
-                    self.player.moveTo(self, self.move_e.x, self.move_e.y);
+                if (self.targetTile != undefined) {
+                    var tile = self.targetTile;
+                    var x = tile.worldX + tile.width / 2;
+                    var y = tile.worldY + tile.height / 2;
+
+                    var dx = tile.worldX + tile.width / 2 - self.player.sprite.world.x;
+                    var dy = tile.worldY + tile.height / 2 - self.player.sprite.world.y;
+                    var adx = Math.abs(dx);
+                    var ady = Math.abs(dy);
+                    if (adx > ady) {
+                        if (dx > 0) {
+                            if (self.playerCanTurnRight()) self.player.right();
+                        }
+                        else {
+                            if (self.playerCanTurnLeft()) self.player.left();
+                        }
+                    }
+                    else {
+                        if (dy > 0) {
+                            if (self.playerCanTurnDown()) self.player.down();
+                        }
+                        else {
+                            if (self.playerCanTurnUp()) self.player.up();
+                        }
+                    }
+                }
+                else {
+                    if (self.playerToLeft == true) {
+                        if (self.playerCanTurnLeft()) self.player.left();
+                    }
+                    if (self.playerToUp == true) {
+                        if (self.playerCanTurnUp()) self.player.up();
+                    }
+                    if (self.playerToRight == true) {
+                        if (self.playerCanTurnRight()) self.player.right();
+                    }
+                    if (self.playerToDown == true) {
+                        if (self.playerCanTurnDown()) self.player.down();
+                    }
                 }
 
-                self.player.updatelevel(self);
-                this.foreachenemy(function (enemy) {
-                    enemy.updatelevel(self);
-                    self.player.updateenemy(enemy, function () {
-                        self.playerOnEnemy();
-                    });
-                });
+                game.physics.arcade.collide(self.player.sprite, self.layer, function (hero, tile) {
+                    if (hero.body.blocked.up == true) {
+                        if (self.playerCanTurnRight()) self.player.right();
+                        else if (self.playerCanTurnLeft()) self.player.left();
+                        else if (self.playerCanTurnDown()) self.player.down();
+                    }
+                    else if (hero.body.blocked.left == true) {
+                        if (self.playerCanTurnUp()) self.player.up();
+                        else if (self.playerCanTurnDown()) self.player.down();
+                        else if (thselfis.playerCanTurnRight()) self.player.right();
+                    }
+                    else if (hero.body.blocked.down == true) {
+                        if (self.playerCanTurnLeft()) self.player.left();
+                        else if (self.playerCanTurnRight()) self.player.right();
+                        else if (self.playerCanTurnUp()) self.player.up();
+                    }
+                    else if (hero.body.blocked.right == true) {
+                        if (self.playerCanTurnDown()) self.player.down();
+                        else if (self.playerCanTurnUp()) self.player.up();
+                        else if (self.playerCanTurnLeft()) self.player.left();
+                    }
+                    else {
+                        self.player.stopanimation();
+                    }
+                }, null, self);
+
+                // this.foreachenemy(function (enemy) {
+                //     enemy.updatelevel(self);
+                //     self.player.updateenemy(enemy, function () {
+                //         self.playerOnEnemy();
+                //     });
+                // });
             };
         };
     });

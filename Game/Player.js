@@ -54,7 +54,7 @@ define([], function () {
         self.restart = function () {
             self.sprite.x = config.x0;
             self.sprite.y = config.y0;
-            self.up();
+            //self.up();
             return self;
         }
 
@@ -97,32 +97,6 @@ define([], function () {
             return self;
         };
 
-        self.moveTo = function(level, x, y) {
-            var tile = level.getPlayerTile();
-
-            var dx = x - self.sprite.worldPosition.x;
-            var dy = y - self.sprite.worldPosition.y;
-            var adx = Math.abs(dx);
-            var ady = Math.abs(dy);
-            if (adx>ady) {
-                if (dx > 0) {
-                    if (level.playerCanTurnRight(tile.x, tile.y)) self.right();
-                }
-                else {
-                    if (level.playerCanTurnLeft(tile.x, tile.y)) self.left();
-                }
-            }
-            else  {
-                if (dy > 0) {
-                    if (level.playerCanTurnDown(tile.x, tile.y)) self.down();
-                }
-                else {
-                    if (level.playerCanTurnUp(tile.x, tile.y)) self.up();
-                }
-            }
-            return self;
-        };
-
         self.stop = function () {
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = 0;
@@ -132,47 +106,6 @@ define([], function () {
 
         self.explode = function () {
             self.sprite.animations.play("explode");
-            return self;
-        };
-
-        self.updatelevel = function (level) {
-            game.physics.arcade.collide(self.sprite, level.layer, function (hero, tile) {
-                if (hero.body.blocked.up == true) {
-                    var x = tile.x; var y = tile.y+1;
-                    if (this.playerCanTurnRight(x, y)) self.right();                        
-                    else if (this.playerCanTurnLeft(x, y)) self.left();
-                    else if (this.playerCanTurnDown(x, y)) self.down();                        
-                }
-                else if (hero.body.blocked.left == true) {
-                    var x = tile.x+1; var y = tile.y;
-                    if (this.playerCanTurnUp(x, y)) self.up();                        
-                    else if (this.playerCanTurnDown(x, y)) self.down();                        
-                    else if (this.playerCanTurnRight(x, y)) self.right();
-                }
-                else if (hero.body.blocked.down == true) {
-                    var x = tile.x; var y = tile.y-1;
-                    if (this.playerCanTurnLeft(x, y)) self.left();
-                    else if (this.playerCanTurnRight(x, y)) self.right();                        
-                    else if (this.playerCanTurnUp(x, y)) self.up();                        
-                }
-                else if (hero.body.blocked.right == true) {
-                    var x = tile.x-1; var y = tile.y;
-                    if (this.playerCanTurnDown(x, y)) self.down();                        
-                    else if (this.playerCanTurnUp(x, y)) self.up();                        
-                    else if (this.playerCanTurnLeft(x, y)) self.left();                        
-                }
-                else {
-                    self.stopanimation();
-                }
-            }, null, level);
-            return self;
-        };
-
-        self.updateenemy = function (enemy, callback) {
-            // handling collision between the hero and the tiles
-            game.physics.arcade.collide(self.sprite, enemy.sprite, function (hero, enemy) {
-                callback();
-            }, null, enemy);
             return self;
         };
 
