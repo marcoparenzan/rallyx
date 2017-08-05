@@ -54,7 +54,7 @@ define([], function () {
         self.restart = function () {
             self.sprite.x = config.x0;
             self.sprite.y = config.y0;
-            //self.up();
+            self.up();
             return self;
         }
 

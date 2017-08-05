@@ -49,7 +49,7 @@ define(["gameOptions", "player"
                 // tile 1 (the black tile) has the collision enabled
                 self.map.setCollisionBetween(2, 40, true);
 
-                self.player.create().restart();
+                self.player.create().restart().up();
 
                 self.targetTile = undefined;
                 game.input.onUp.add(function (e) {
