@@ -11,7 +11,7 @@ define(["gameOptions", "player"
                 this.player = new Player(game, {
                     x0: 20 * 96 + 48,
                     y0: 54 * 96 + 48,
-                    speed: 400
+                    speed: 600
                 });
                 this.player.preload();
 

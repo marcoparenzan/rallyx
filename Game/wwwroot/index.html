@@ -1,0 +1,53 @@
+<html>
+
+<body style="text-align:center;">
+    <a href="https://github.com/marcoparenzan/rallyx"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+    <h1>Rally X</h1>
+    <div id="game">
+    </div>
+    <div>
+        <p>Use keyboard LEFT/RIGHT/UP/DOWN to move and SPACEBAR to go, or TAP on mobile</p>
+    </div>
+    <script src="require.js"></script>
+    <script src="phaser.js"></script>
+    <script src="game.js"></script>
+    <script>
+        var socket;
+        var scheme = document.location.protocol == "https:" ? "wss" : "ws";
+        var port = document.location.port ? (":" + document.location.port) : "";
+        var connectionUrl = scheme + "://" + document.location.hostname + port + "/ws";
+        var closeSocket = function () {
+            if (!socket || socket.readyState != WebSocket.OPEN) {
+                alert("socket not connected");
+            }
+            socket.close(1000, "Closing from client");
+        };
+        var sendMessage = function (data) {
+            if (!socket || socket.readyState != WebSocket.OPEN) {
+                alert("socket not connected");
+            }
+            socket.send(data);
+        };
+        var connectSocket = function () {
+            socket = new WebSocket(connectionUrl.value);
+            socket.onopen = function (event) {
+            };
+            socket.onclose = function (event) {
+            };
+            // socket.onerror = updateState;
+            socket.onmessage = function (event) {
+                // htmlEscape(event.data)
+            };
+        };
+        function htmlEscape(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+    </script>
+</body>
+
+</html>
