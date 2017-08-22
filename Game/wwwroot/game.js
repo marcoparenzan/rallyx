@@ -8,7 +8,7 @@ requirejs([
     "gameOptions",
     "screen",
 ], function (gameOptions,
-    Screen,
+    Screen
 ) {
         game = new Phaser.Game(gameOptions.gameWidth, gameOptions.gameHeight, null, "game");
 

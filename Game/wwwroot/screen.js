@@ -1,17 +1,15 @@
-define(["gameOptions", "player"
-    // , "enemy"
-], function (gameOptions, Player
-    // , Enemy
+define(["gameOptions", "car"
+], function (gameOptions, Car
 ) {
         return function (game) {
             this.preload = function () {
                 game.load.tilemap("default", 'assets/rallyx-map.json', null, Phaser.Tilemap.TILED_JSON);
                 game.load.image("default", "assets/rallyx-map-tileset.png");
 
-                this.player = new Player(game, {
+                this.player = new Car(game, {
                     x0: 20 * 96 + 48,
                     y0: 54 * 96 + 48,
-                    speed: 600
+                    speed: 400
                 });
                 this.player.preload();
 
@@ -23,16 +21,26 @@ define(["gameOptions", "player"
                     }
                 };
 
-                // this.enemies["1"] = new Enemy(game, {
-                //     name: "enemy1",
-                //     spriteframesname: "06",
-                //     x0: 13*8+12,
-                //     y0: 7*8,
-                //     y1: 7*8,
-                //     y2: 22*8,
-                //     speed: 95,
-                //     mode: "ud"
-                // }).preload();
+                this.enemies["1"] = new Car(game, {
+                    x0: 18 * 96 + 48,
+                    y0: 57 * 96 + 48,
+                    speed: 400,
+                    type: 1
+                }).preload();
+
+                this.enemies["2"] = new Car(game, {
+                    x0: 20 * 96 + 48,
+                    y0: 57 * 96 + 48,
+                    speed: 400,
+                    type: 1
+                }).preload();
+
+                this.enemies["3"] = new Car(game, {
+                    x0: 22 * 96 + 48,
+                    y0: 57 * 96 + 48,
+                    speed: 400,
+                    type: 1
+                }).preload();
             };
 
             this.create = function () {
@@ -51,18 +59,22 @@ define(["gameOptions", "player"
 
                 self.player.create().restart().up();
 
-                self.targetTile = undefined;
+                self.targetPlayerTile = undefined;
                 game.input.onUp.add(function (e) {
-                    if (self.targetTile == undefined) return;
-                    self.targetTile = undefined;
+                    if (self.targetPlayerTile == undefined) return;
+                    self.targetPlayerTile = undefined;
                 });
 
+                var getTile = function (x, y) {
+                    return self.map.getTileWorldXY(x, y, self.map.tileWidth, self.map.tileHeight, self.layer);
+                };
+
                 game.input.onHold.add(function (e) {
-                    self.targetTile = self.getTile(game.input.worldX, game.input.worldY);
+                    self.targetPlayerTile = getTile(game.input.worldX, game.input.worldY);
                 });
 
                 game.input.onDown.add(function (e) {
-                    self.targetTile = self.getTile(game.input.worldX, game.input.worldY);
+                    self.targetPlayerTile = getTile(game.input.worldX, game.input.worldY);
                 }, self);
 
                 self.playerToLeft = false;
@@ -115,74 +127,6 @@ define(["gameOptions", "player"
                 game.camera.follow(self.player.sprite, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
             };
 
-            this.getPlayerTile = function () {
-                var self = this;
-                return self.getTile(self.player.sprite.world.x, self.player.sprite.world.y);
-            };
-
-            this.getTile = function (x, y) {
-                var self = this;
-                return self.map.getTileWorldXY(x, y, self.map.tileWidth, self.map.tileHeight, self.layer);
-            };
-
-            this.playerCanTurnRight = function () {
-                var self = this;
-                var tile1 = self.getPlayerTile();
-                var tile = self.map.getTileRight(self.map.currentLayer, tile1.x, tile1.y);
-                if (tile == undefined) return false;
-                if (tile.index > 1) return false;
-                if ((self.player.sprite.y - self.player.sprite.height / 2) < (tile.worldY)) return false;
-                if ((self.player.sprite.y + self.player.sprite.height / 2) > (tile.worldY + tile.height)) return false;
-                return true;
-            };
-
-            this.playerCanTurnDown = function () {
-                var self = this;
-                var tile1 = self.getPlayerTile();
-                var tile = self.map.getTileBelow(self.map.currentLayer, tile1.x, tile1.y);
-                if (tile == undefined) return false;
-                if (tile.index > 1) return false;
-                if ((self.player.sprite.x - self.player.sprite.width / 2) < (tile.worldX)) return false;
-                if ((self.player.sprite.x + self.player.sprite.width / 2) > (tile.worldX + tile.width)) return false;
-                return true;
-            };
-
-            this.playerCanTurnLeft = function () {
-                var self = this;
-                var tile1 = self.getPlayerTile();
-                var tile = self.map.getTileLeft(self.map.currentLayer, tile1.x, tile1.y);
-                if (tile == undefined) return false;
-                if (tile.index > 1) return false;
-                if ((self.player.sprite.y - self.player.sprite.height / 2) < (tile.worldY)) return false;
-                if ((self.player.sprite.y + self.player.sprite.height / 2) > (tile.worldY + tile.height)) return false;
-                return true;
-            };
-
-            this.playerCanTurnUp = function () {
-                var self = this;
-                var tile1 = self.getPlayerTile();
-                var tile = self.map.getTileAbove(self.map.currentLayer, tile1.x, tile1.y);
-                if (tile == undefined) return false;
-                if (tile.index > 1) return false;
-                if ((self.player.sprite.x - self.player.sprite.width / 2) < (tile.worldX)) return false;
-                if ((self.player.sprite.x + self.player.sprite.width / 2) > (tile.worldX + tile.width)) return false;
-                return true;
-            };
-
-            this.playerOnEnemy = function () {
-                var self = this;
-                self.suspend();
-                var id = setTimeout(function () {
-                    self.player.explode();
-                    // self.decreaseLife();
-                    var id1 = setTimeout(function () {
-                        self.restart();
-                        clearTimeout(id1);
-                    }, 250);
-                    clearTimeout(id);
-                }, 1000);
-            };
-
             this.suspend = function () {
                 var self = this;
                 self._suspended = true;
@@ -211,79 +155,34 @@ define(["gameOptions", "player"
 
                 if (self._suspended == true) return;
 
-                if (self.targetTile != undefined) {
-                    var tile = self.targetTile;
-                    var x = tile.worldX + tile.width / 2;
-                    var y = tile.worldY + tile.height / 2;
-
-                    var dx = tile.worldX + tile.width / 2 - self.player.sprite.world.x;
-                    var dy = tile.worldY + tile.height / 2 - self.player.sprite.world.y;
-                    var adx = Math.abs(dx);
-                    var ady = Math.abs(dy);
-                    if (adx > ady) {
-                        if (dx > 0) {
-                            if (self.playerCanTurnRight()) self.player.right();
-                        }
-                        else {
-                            if (self.playerCanTurnLeft()) self.player.left();
-                        }
-                    }
-                    else {
-                        if (dy > 0) {
-                            if (self.playerCanTurnDown()) self.player.down();
-                        }
-                        else {
-                            if (self.playerCanTurnUp()) self.player.up();
-                        }
-                    }
+                if (self.targetPlayerTile != undefined) {
+                    self.player.follow(self.targetPlayerTile, self.map, self.layer);
                 }
                 else {
                     if (self.playerToLeft == true) {
-                        if (self.playerCanTurnLeft()) self.player.left();
+                        if (self.player.canTurnLeft(self.map, self.layer)) self.player.left();
                     }
                     if (self.playerToUp == true) {
-                        if (self.playerCanTurnUp()) self.player.up();
+                        if (self.player.canTurnUp(self.map, self.layer)) self.player.up();
                     }
                     if (self.playerToRight == true) {
-                        if (self.playerCanTurnRight()) self.player.right();
+                        if (self.player.canTurnRight(self.map, self.layer)) self.player.right();
                     }
                     if (self.playerToDown == true) {
-                        if (self.playerCanTurnDown()) self.player.down();
+                        if (self.player.canTurnDown(self.map, self.layer)) self.player.down();
                     }
                 }
+                var playerTile = self.player.getTile(self.map, self.layer);
+                this.foreachenemy(function (enemy) {
+                    enemy.follow(playerTile, self.map, self.layer);
+                });
 
-                game.physics.arcade.collide(self.player.sprite, self.layer, function (hero, tile) {
-                    if (hero.body.blocked.up == true) {
-                        if (self.playerCanTurnRight()) self.player.right();
-                        else if (self.playerCanTurnLeft()) self.player.left();
-                        else if (self.playerCanTurnDown()) self.player.down();
-                    }
-                    else if (hero.body.blocked.left == true) {
-                        if (self.playerCanTurnUp()) self.player.up();
-                        else if (self.playerCanTurnDown()) self.player.down();
-                        else if (thselfis.playerCanTurnRight()) self.player.right();
-                    }
-                    else if (hero.body.blocked.down == true) {
-                        if (self.playerCanTurnLeft()) self.player.left();
-                        else if (self.playerCanTurnRight()) self.player.right();
-                        else if (self.playerCanTurnUp()) self.player.up();
-                    }
-                    else if (hero.body.blocked.right == true) {
-                        if (self.playerCanTurnDown()) self.player.down();
-                        else if (self.playerCanTurnUp()) self.player.up();
-                        else if (self.playerCanTurnLeft()) self.player.left();
-                    }
-                    else {
-                        self.player.stopanimation();
-                    }
-                }, null, self);
 
-                // this.foreachenemy(function (enemy) {
-                //     enemy.updatelevel(self);
-                //     self.player.updateenemy(enemy, function () {
-                //         self.playerOnEnemy();
-                //     });
-                // });
+                self.player.update(self.map, self.layer);
+
+                this.foreachenemy(function (enemy) {
+                    enemy.update(self.map, self.layer);
+                });
             };
         };
     });
