@@ -5,9 +5,9 @@ requirejs.config({
 
 requirejs([
     "gameOptions",
-    "screen",
+    "solo",
 ], function (gameOptions,
-    Screen
+    Solo
 ) {
     game = new Phaser.Game(gameOptions.gameWidth, gameOptions.gameHeight, null, "game");
 
@@ -41,7 +41,7 @@ requirejs([
         };
 
         this.start = function () {
-            game.state.start("screen");
+            game.state.start("solo");
         };
 
         this.create = function () {
@@ -65,6 +65,6 @@ requirejs([
 
     game.state.add("init", new Init(game));
     game.state.add("title", new Title(game));
-    game.state.add("screen", new Screen(game));
+    game.state.add("solo", new Solo(game));
     game.state.start("init");
 });
