@@ -324,6 +324,11 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
             if (self._suspended == true) return;
 
             self.player.update(self.map, self.layer);
+            if (self.player.fuel <= 0) {
+                // if player runs out of fuel, just explode
+                self.explodes();                
+            }
+
             forall(self.enemies, function(enemy) { 
                 enemy.update(self.map, self.layer); 
             });
