@@ -95,6 +95,9 @@ define([], function () {
             self.sprite.x = config.x0;
             self.sprite.y = config.y0;
             self.sprite.animations.play("up");
+            if (config.initialFuel !== undefined) {
+                self.fuel = config.initialFuel;   
+            }
             return self;
         };
 
@@ -215,6 +218,10 @@ define([], function () {
 
         self.update = function(map, layer) {
             if (self.suspended === true) return;
+
+            if (self.fuel !== undefined) {
+                self.fuel -= 1/50;
+            }
             
             self.sprite.game.physics.arcade.collide(self.sprite, layer, function (sprite, tile) {
                 if (sprite.body.blocked.up == true) {

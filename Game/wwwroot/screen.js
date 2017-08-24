@@ -1,4 +1,4 @@
-define(["gameOptions", "car"], function (gameOptions, Car) {
+define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver) {
 
     var every = function (self, callback) {
         var keys = Object.keys(self);
@@ -39,7 +39,8 @@ define(["gameOptions", "car"], function (gameOptions, Car) {
                 y0: 54 * 96 + 48,
                 speed: 400,
                 initialScore: 0,
-                initialLives: 3
+                initialLives: 3,
+                initialFuel: 100
             }).preload();
 
             this.enemies = {};
@@ -51,7 +52,7 @@ define(["gameOptions", "car"], function (gameOptions, Car) {
                 type: 1
             }).preload();
 
-            this.enemies.enemy2= new Car(game, {
+            this.enemies.enemy2 = new Car(game, {
                 id: "enemy2",
                 x0: 20 * 96 + 48,
                 y0: 57 * 96 + 48,
@@ -74,6 +75,8 @@ define(["gameOptions", "car"], function (gameOptions, Car) {
             this.smokes = {};
 
             this.holes = {};
+
+            this.gameOver = new GameOver(game).preload();
         };
 
         this.create = function () {
@@ -162,6 +165,35 @@ define(["gameOptions", "car"], function (gameOptions, Car) {
             this.restart();
         };
 
+        this.catchTheFlag = function() {
+            var self = this;
+            self.player.addScore(self.nextFlagScore);
+            self.nextFlagScore += 100;
+            flag.delete();
+            delete self.flags[flag.id];
+        };
+
+        this.explodes = function() {
+            var self = this;
+            self.suspend();
+            self.player.explode();
+            if (self.player.lives === 0) {
+                setTimeout(function(){ 
+                    // game over
+                    self.gameOver.show(self.player.sprite.x, self.player.sprite.y);
+                    setTimeout(function(){ 
+                        game.state.start("title");                    
+                    }, 3000);
+                }, 1000);
+            }
+            else {
+                // crash
+                setTimeout(function() {
+                    self.restart();
+                }, 1000);
+            }
+        };
+
         this.suspend = function () {
             var self = this;
             self.player.suspend();
@@ -194,7 +226,7 @@ define(["gameOptions", "car"], function (gameOptions, Car) {
         this.update = function () {
             var self = this;
 
-            game.debug.text("Player 1 | Score " + self.player.score + " | Lives " + self.player.lives, 10, 10);
+            game.debug.text("Player 1 | Score " + self.player.score + " | Lives " + self.player.lives + " | Fuel " + parseInt(self.player.fuel), 10, 10);
 
             if (self._suspended == true) return;
 
@@ -229,28 +261,15 @@ define(["gameOptions", "car"], function (gameOptions, Car) {
 
             // player to enemy collision
             collidesWith(self.player, self.enemies, function(player, enemy) {
-                self.suspend();
-                self.player.explode();
-                // crash
-                setTimeout(function() {
-                    self.restart();
-                }, 1000);
+                self.explodes();
             });
 
             collidesWith(self.player, self.flags, function(player, flag) {
-                self.player.addScore(self.nextFlagScore);
-                self.nextFlagScore += 100;
-                flag.delete();
-                delete self.flags[flag.id];
+                self.catchTheFlag();
             });
 
             collidesWith(self.player, self.holes, function(player, hole) {
-                self.suspend();
-                self.player.explode();
-                // crash
-                setTimeout(function() {
-                    self.restart();
-                }, 1000);
+                self.explodes();
             });
 
             every(self.enemies, function(enemy){
