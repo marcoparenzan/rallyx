@@ -16,7 +16,7 @@ define([], function () {
 
             var frameRate = 20;
             
-            self.sprite.animations.add('hole', [0], frameRate, false);
+            self.sprite.animations.add('rocks', [0], frameRate, false);
             self.sprite.animations.add('flag', [4], frameRate, false);
             self.sprite.animations.add('flagL', [5], frameRate, false);
             self.sprite.animations.add('flagS', [6], frameRate, false);

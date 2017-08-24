@@ -131,36 +131,36 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
            
             this.smokes = {};
 
-            this.holes = {};
-            this.holes.hole1 = new StaticObject(game, {
-                id: "hole1",
+            this.rocks = {};
+            this.rocks.rock1 = new StaticObject(game, {
+                id: "rock1",
                 x0: 12 * 96 + 48,
                 y0: 4 * 96 + 48,
-                type: "hole"
+                type: "rock"
             }).preload();
-            this.holes.hole2 = new StaticObject(game, {
-                id: "hole2",
+            this.rocks.rock2 = new StaticObject(game, {
+                id: "rock2",
                 x0: 27 * 96 + 48,
                 y0: 31 * 96 + 48,
-                type: "hole"
+                type: "rock"
             }).preload();
-            this.holes.hole3 = new StaticObject(game, {
-                id: "hole3",
+            this.rocks.rock3 = new StaticObject(game, {
+                id: "rock3",
                 x0: 36 * 96 + 48,
                 y0: 43 * 96 + 48,
-                type: "hole"
+                type: "rock"
             }).preload();
-            this.holes.hole4 = new StaticObject(game, {
-                id: "hole4",
+            this.rocks.rock4 = new StaticObject(game, {
+                id: "rock4",
                 x0: 15 * 96 + 48,
                 y0: 22 * 96 + 48,
-                type: "hole"
+                type: "rock"
             }).preload();            
-            this.holes.hole5 = new StaticObject(game, {
-                id: "hole5",
+            this.rocks.rock5 = new StaticObject(game, {
+                id: "rock5",
                 x0: 26 * 96 + 48,
                 y0: 47 * 96 + 48,
-                type: "hole"
+                type: "rock"
             }).preload();
 
             this.gameOver = new GameOver(game).preload();
@@ -245,8 +245,8 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
             forall(this.flags, function (flag) {
                 flag.create();
             });            
-            forall(this.holes, function (hole) {
-                hole.create();
+            forall(this.rocks, function (rock) {
+                rock.create();
             });
             // set workd bounds to allow camera to follow the player
             game.world.setBounds(0, 0, 1008 * 4, 1536 * 4);
@@ -325,7 +325,7 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
 
             self.player.update(self.map, self.layer);
             if (self.player.fuel <= 0) {
-                // if player runs out of fuel, just explode
+                // if player runs out of fuel, just explode (not checked the real game)
                 self.explodes();                
             }
 
@@ -333,7 +333,7 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
                 enemy.update(self.map, self.layer); 
             });
             forall(self.flags, function(flag) { flag.update(self.map, self.layer); });
-            forall(self.holes, function(hole) { hole.update(self.map, self.layer); });
+            forall(self.rocks, function(rock) { rock.update(self.map, self.layer); });
 
             // driving
             if (self.targetPlayerTile != undefined) {
@@ -367,7 +367,7 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
                 // enemies pass over flag....
             });
 
-            collisionAmong(self.player, self.holes, function(player, hole) {
+            collisionAmong(self.player, self.rocks, function(player, rock) {
                 self.explodes();
             });
 
@@ -379,8 +379,8 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
                     enemy2.reverse();
                 });    
 
-                collisionAmong(enemy, self.holes, function(enemy, hole) {
-                    enemy.reverse(); // enemies does not explode over holes, just reverse
+                collisionAmong(enemy, self.rocks, function(enemy, rock) {
+                    enemy.reverse(); // enemies does not explode over rocks, just reverse
                 });    
 
             });
