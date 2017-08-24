@@ -6,19 +6,9 @@ define([], function () {
         if (config.initialLives !== undefined) {
             self.lives = config.initialLives;
 
-            self.looseLife = function () {
-                self.lives--;
-                return self;
-            };
-
-            self.addLife = function () {
-                self.lives++;
-                return self;
-            };
-
             self.explode = function () {
                 self.sprite.animations.play("explode");
-                self.looseLife();
+                self.lives--;
                 return self;
             };
         }
@@ -74,6 +64,8 @@ define([], function () {
             self.sprite.anchor.x = 0.5;
             self.sprite.anchor.y = 0.5;
 
+            self.reset();
+
             return self;
         };
 
@@ -88,7 +80,7 @@ define([], function () {
                     return "up";
                 case Phaser.DOWN:
                     return "down";
-                case Phaser.NONE:
+                // case Phaser.NONE:
                 default:
                     return "stop";
             }
@@ -109,15 +101,11 @@ define([], function () {
         self.reset = function () {
             self.sprite.x = config.x0;
             self.sprite.y = config.y0;
-            self.sprite.animations.play("up");
             if (config.initialFuel !== undefined) {
                 self.fuel = config.initialFuel;
             }
-            return self;
-        };
-
-        self.restart = function () {
-            self.suspended = false;
+            self.sprite.animations.play("up");
+            // self.sprite.body.facing = Phaser.UP;
             return self;
         };
 
@@ -127,9 +115,16 @@ define([], function () {
             return self;
         };
 
+        self.continue = function () {
+            self.suspended = false;
+            var direction = self.direction();
+            self[direction]();
+            return self;
+        };
+
         self.left = function () {
-            if (self.sprite.body.velocity.x < 0) return;
             var sourceDirection = self.direction();
+            if (sourceDirection === "left" && self.sprite.body.velocity.x<0) return;
             if (sourceDirection === "stop") sourceDirection = "";
             self.sprite.animations.play(sourceDirection + "left");
             self.sprite.body.velocity.x = -config.speed;
@@ -138,8 +133,9 @@ define([], function () {
         };
 
         self.right = function () {
-            if (self.sprite.body.velocity.x > 0) return;
             var sourceDirection = self.direction();
+            if (sourceDirection === "right" && self.sprite.body.velocity.x>0) return;
+            if (sourceDirection === "stop") sourceDirection = "";
             self.sprite.animations.play(sourceDirection + "right");
             self.sprite.body.velocity.x = config.speed;
             self.sprite.body.velocity.y = 0;
@@ -147,8 +143,9 @@ define([], function () {
         };
 
         self.up = function () {
-            if (self.sprite.body.velocity.y < 0) return;
             var sourceDirection = self.direction();
+            if (sourceDirection === "up" && self.sprite.body.velocity.y<0) return;
+            if (sourceDirection === "stop") sourceDirection = "";
             self.sprite.animations.play(sourceDirection + "up");
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = -config.speed;
@@ -156,11 +153,19 @@ define([], function () {
         };
 
         self.down = function () {
-            if (self.sprite.body.velocity.y > 0) return;
             var sourceDirection = self.direction();
+            if (sourceDirection === "down" && self.sprite.body.velocity.y>0) return;
+            if (sourceDirection === "stop") sourceDirection = "";
             self.sprite.animations.play(sourceDirection + "down");
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = config.speed;
+            return self;
+        };
+
+        self.stop = function () {
+            self.sprite.body.velocity.x = 0;
+            self.sprite.body.velocity.y = 0;
+            self.sprite.animations.stop();
             return self;
         };
 
@@ -175,18 +180,6 @@ define([], function () {
             } else if (direction === "up") {
                 self.down();
             }
-        };
-
-        self.continue = function () {
-            var direction = self.direction();
-            self[direction]();
-        };
-
-        self.stop = function () {
-            self.sprite.body.velocity.x = 0;
-            self.sprite.body.velocity.y = 0;
-            self.sprite.animations.stop();
-            return self;
         };
 
         self.canTurnLeft = function (map, layer) {

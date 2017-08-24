@@ -1,4 +1,4 @@
-define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions, Car, GameOver, StaticObject) {
+define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions, Car, GameOver, Flag, Rock) {
 
     var forall = function (self, callback) {
         var keys = Object.keys(self);
@@ -10,15 +10,18 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
         }
         return self;
     };
-    
+
     var collisionAmong = function (self, set, callback) {
         var keys = Object.keys(set);
         var i = 0;
+        var exit = false;
         while (true) {
+            if (exit) break;
             if (i === keys.length) break;
             var item = set[keys[i]];
             game.physics.arcade.collide(self.sprite, item.sprite, function (selfsprite, itemsprite) {
                 callback(self, this); // this === item
+                exit = true;
             }, null, item);
             i++;
         }
@@ -66,110 +69,95 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
                 type: 1
             }).preload();
 
-            this.nextFlagScore = 100;
             this.flags = {};
-            this.flags.flags1 = new StaticObject(game, {
+            this.flags.flags1 = new Flag(game, {
                 id: "flags1",
                 x0: 8 * 96 + 48,
-                y0: 9 * 96 + 48,
-                type: "flag"
+                y0: 9 * 96 + 48
             }).preload();
-            this.flags.flags2 = new StaticObject(game, {
+            this.flags.flags2 = new Flag(game, {
                 id: "flags2",
                 x0: 30 * 96 + 48,
-                y0: 14 * 96 + 48,
-                type: "flag"
+                y0: 14 * 96 + 48
             }).preload();
-            this.flags.flags3 = new StaticObject(game, {
+            this.flags.flags3 = new Flag(game, {
                 id: "flags3",
                 x0: 36 * 96 + 48,
-                y0: 49 * 96 + 48,
-                type: "flag"
+                y0: 49 * 96 + 48
             }).preload();
-            this.flags.flags4 = new StaticObject(game, {
+            this.flags.flags4 = new Flag(game, {
                 id: "flags4",
                 x0: 10 * 96 + 48,
-                y0: 46 * 96 + 48,
-                type: "flag"
+                y0: 46 * 96 + 48
             }).preload();
-            this.flags.flags5 = new StaticObject(game, {
+            this.flags.flags5 = new Flag(game, {
                 id: "flags5",
                 x0: 13 * 96 + 48,
-                y0: 26 * 96 + 48,
-                type: "flag"
+                y0: 26 * 96 + 48
             }).preload();
-            this.flags.flags6 = new StaticObject(game, {
+            this.flags.flags6 = new Flag(game, {
                 id: "flags6",
                 x0: 27 * 96 + 48,
-                y0: 28 * 96 + 48,
-                type: "flag"
+                y0: 28 * 96 + 48
             }).preload();
-            this.flags.flags7 = new StaticObject(game, {
+            this.flags.flags7 = new Flag(game, {
                 id: "flags7",
                 x0: 17 * 96 + 48,
-                y0: 42 * 96 + 48,
-                type: "flag"
+                y0: 42 * 96 + 48
             }).preload();
-            this.flags.flags8 = new StaticObject(game, {
+            this.flags.flags8 = new Flag(game, {
                 id: "flags8",
                 x0: 35 * 96 + 48,
-                y0: 18 * 96 + 48,
-                type: "flag"
+                y0: 18 * 96 + 48
             }).preload();
-            this.flags.flags9 = new StaticObject(game, {
+            this.flags.flags9 = new Flag(game, {
                 id: "flags9",
                 x0: 5 * 96 + 48,
-                y0: 23 * 96 + 48,
-                type: "flag"
+                y0: 23 * 96 + 48
             }).preload();
-            this.flags.flags10 = new StaticObject(game, {
+            this.flags.flags10 = new Flag(game, {
                 id: "flags10",
                 x0: 30 * 96 + 48,
                 y0: 33 * 96 + 48,
-                type: "flag"
+                doubleValue: true
             }).preload();
-           
+
             this.smokes = {};
 
             this.rocks = {};
-            this.rocks.rock1 = new StaticObject(game, {
+            this.rocks.rock1 = new Rock(game, {
                 id: "rock1",
                 x0: 12 * 96 + 48,
-                y0: 4 * 96 + 48,
-                type: "rock"
+                y0: 4 * 96 + 48
             }).preload();
-            this.rocks.rock2 = new StaticObject(game, {
+            this.rocks.rock2 = new Rock(game, {
                 id: "rock2",
                 x0: 27 * 96 + 48,
-                y0: 31 * 96 + 48,
-                type: "rock"
+                y0: 31 * 96 + 48
             }).preload();
-            this.rocks.rock3 = new StaticObject(game, {
+            this.rocks.rock3 = new Rock(game, {
                 id: "rock3",
                 x0: 36 * 96 + 48,
-                y0: 43 * 96 + 48,
-                type: "rock"
+                y0: 43 * 96 + 48
             }).preload();
-            this.rocks.rock4 = new StaticObject(game, {
+            this.rocks.rock4 = new Rock(game, {
                 id: "rock4",
                 x0: 15 * 96 + 48,
-                y0: 22 * 96 + 48,
-                type: "rock"
-            }).preload();            
-            this.rocks.rock5 = new StaticObject(game, {
+                y0: 22 * 96 + 48
+            }).preload();
+            this.rocks.rock5 = new Rock(game, {
                 id: "rock5",
                 x0: 26 * 96 + 48,
-                y0: 47 * 96 + 48,
-                type: "rock"
+                y0: 47 * 96 + 48
             }).preload();
 
             this.gameOver = new GameOver(game).preload();
         };
 
         this.create = function () {
-            game.stage.backgroundColor = gameOptions.bgColor;
-
             var self = this;
+
+            game.stage.backgroundColor = gameOptions.bgColor;
 
             // creatin of "level" tilemap
             self.map = game.add.tilemap("default");
@@ -244,44 +232,47 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
             });
             forall(this.flags, function (flag) {
                 flag.create();
-            });            
+            });
             forall(this.rocks, function (rock) {
                 rock.create();
             });
+
             // set workd bounds to allow camera to follow the player
             game.world.setBounds(0, 0, 1008 * 4, 1536 * 4);
-
             // making the camera follow the player
             game.camera.follow(self.player.sprite, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
 
             this.restart();
         };
 
-        this.catchTheFlag = function(flag) {
+        this.catchTheFlag = function (flag) {
             var self = this;
-            self.player.addScore(self.nextFlagScore);
+            self.suspend();
+            if (flag.doubleValue()) {
+                self.multiplyFlagScore = 2;
+            }
+            self.player.addScore(self.nextFlagScore * self.multiplyFlagScore);
+            flag.catch(self.nextFlagScore, self.multiplyFlagScore === 2);
             self.nextFlagScore += 100;
-            flag.delete();
             delete self.flags[flag.id];
-            self.player.continue();
+            self.continue();
         };
 
-        this.explodes = function() {
+        this.explodes = function () {
             var self = this;
             self.suspend();
             self.player.explode();
             if (self.player.lives === 0) {
-                setTimeout(function(){ 
+                setTimeout(function () {
                     // game over
                     self.gameOver.show(self.player.sprite.x, self.player.sprite.y);
-                    setTimeout(function(){ 
-                        game.state.start("title");                    
+                    setTimeout(function () {
+                        game.state.start("title");
                     }, 3000);
                 }, 1000);
-            }
-            else {
+            } else {
                 // crash
-                setTimeout(function() {
+                setTimeout(function () {
                     self.restart();
                 }, 1000);
             }
@@ -293,27 +284,43 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
             forall(this.enemies, function (car) {
                 car.suspend();
             });
-            self._suspended = true;
+            self.suspended = true;
+        };
+
+        this.continue = function (enemiesDelayed) {
+            var self = this;
+            self.suspended = false;
+            self.player.continue();
+            if (enemiesDelayed == true) {
+                setTimeout(function () {
+                    forall(self.enemies, function (car) {
+                        car.continue();
+                    });
+                }, 2000);
+            } else {
+                forall(self.enemies, function (car) {
+                    car.continue();
+                });
+            }
         };
 
         this.restart = function () {
             var self = this;
+
+            self.nextFlagScore = 100;
+            self.multiplyFlagScore = 1;
 
             self.player.reset();
             forall(self.enemies, function (car) {
                 car.reset();
             });
 
-            setTimeout(function(){
-                self.player.restart().up();
-                setTimeout(function() {
-                    forall(self.enemies, function (car) {
-                        car.restart();
-                    });
-                }, 2000);
-            }, 1000);
+            setTimeout(function () {
+                self.continue(true);
+                self.player.up();
+            }, 2000);
 
-            self._suspended = false;
+            self.suspended = false;
         };
 
         this.update = function () {
@@ -321,19 +328,23 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
 
             game.debug.text("Player 1 | Score " + self.player.score + " | Lives " + self.player.lives + " | Fuel " + parseInt(self.player.fuel), 10, 10);
 
-            if (self._suspended == true) return;
+            if (self.suspended == true) return;
 
             self.player.update(self.map, self.layer);
             if (self.player.fuel <= 0) {
                 // if player runs out of fuel, just explode (not checked the real game)
-                self.explodes();                
+                self.explodes();
             }
 
-            forall(self.enemies, function(enemy) { 
-                enemy.update(self.map, self.layer); 
+            forall(self.enemies, function (enemy) {
+                enemy.update(self.map, self.layer);
             });
-            forall(self.flags, function(flag) { flag.update(self.map, self.layer); });
-            forall(self.rocks, function(rock) { rock.update(self.map, self.layer); });
+            forall(self.flags, function (flag) {
+                flag.update(self.map, self.layer);
+            });
+            forall(self.rocks, function (rock) {
+                rock.update(self.map, self.layer);
+            });
 
             // driving
             if (self.targetPlayerTile != undefined) {
@@ -358,32 +369,32 @@ define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions
             });
 
             // player to enemy collision
-            collisionAmong(self.player, self.enemies, function(player, enemy) {
+            collisionAmong(self.player, self.enemies, function (player, enemy) {
                 self.explodes();
             });
 
-            collisionAmong(self.player, self.flags, function(player, flag) {
+            collisionAmong(self.player, self.flags, function (player, flag) {
                 self.catchTheFlag(flag);
                 // enemies pass over flag....
             });
 
-            collisionAmong(self.player, self.rocks, function(player, rock) {
+            collisionAmong(self.player, self.rocks, function (player, rock) {
                 self.explodes();
             });
 
-            forall(self.enemies, function(enemy){
+            forall(self.enemies, function (enemy) {
 
-                collisionAmong(enemy, self.enemies, function(enemy1, enemy2) {
+                collisionAmong(enemy, self.enemies, function (enemy1, enemy2) {
                     if (enemy1.id === enemy2.id) return;
                     enemy1.reverse();
                     enemy2.reverse();
-                });    
+                });
 
-                collisionAmong(enemy, self.rocks, function(enemy, rock) {
+                collisionAmong(enemy, self.rocks, function (enemy, rock) {
                     enemy.reverse(); // enemies does not explode over rocks, just reverse
-                });    
+                });
 
             });
-     };
+        };
     };
 });
