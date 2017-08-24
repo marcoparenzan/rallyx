@@ -253,9 +253,32 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
             }
             self.player.addScore(self.nextFlagScore * self.multiplyFlagScore);
             flag.catch(self.nextFlagScore, self.multiplyFlagScore === 2);
-            self.nextFlagScore += 100;
             delete self.flags[flag.id];
-            self.continue();
+            if (self.flags.length === 0) {
+                self.gameover();
+            } else {
+                self.nextFlagScore += 100;
+                self.continue();
+            }
+        };
+
+        this.gameover = function () {
+            var self = this;
+            setTimeout(function () {
+                // game over
+                self.gameOver.show(self.player.sprite.x, self.player.sprite.y);
+                var timer = setInterval(function () {
+                    if (self.player.fuel > 0) {
+                        self.player.addScore(10);
+                        self.player.fuel--;
+                    } else {
+                        clearInterval(timer);
+                        setTimeout(function () {
+                            game.state.start("title");
+                        }, 1000);
+                    }
+                }, 25);
+            }, 500);
         };
 
         this.explodes = function () {
@@ -263,13 +286,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
             self.suspend();
             self.player.explode();
             if (self.player.lives === 0) {
-                setTimeout(function () {
-                    // game over
-                    self.gameOver.show(self.player.sprite.x, self.player.sprite.y);
-                    setTimeout(function () {
-                        game.state.start("title");
-                    }, 3000);
-                }, 1000);
+                self.gameover();
             } else {
                 // crash
                 setTimeout(function () {
