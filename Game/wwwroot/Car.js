@@ -1,20 +1,21 @@
+// 2017.08.24 code works, but look at https://phaser.io/tutorials/coding-tips-005 to improve the grid testing
 define([], function () {
     return function (game, config) {
         var self = this;
         self.suspended = true;
         if (config.initialLives !== undefined) {
             self.lives = config.initialLives;
-    
-            self.looseLife = function() {
+
+            self.looseLife = function () {
                 self.lives--;
                 return self;
             };
-    
-            self.addLife = function() {
+
+            self.addLife = function () {
                 self.lives++;
                 return self;
             };
-                
+
             self.explode = function () {
                 self.sprite.animations.play("explode");
                 self.looseLife();
@@ -22,14 +23,14 @@ define([], function () {
             };
         }
         if (config.initialScore !== undefined) {
-            self.score = config.initialScore;   
-            
-            self.addScore = function(value) {
+            self.score = config.initialScore;
+
+            self.addScore = function (value) {
                 self.score += value;
                 return self;
             };
         }
-        
+
         self.preload = function () {
             game.load.spritesheet("car" + config.id, "assets/car-spritesheet.png", 64, 64);
             return self;
@@ -44,28 +45,28 @@ define([], function () {
 
             var frameRate = 20;
 
-            self.sprite.animations.add('right', [typeIndex+3], frameRate, false);
-            self.sprite.animations.add('leftright', [typeIndex+9, typeIndex+10, typeIndex+11, typeIndex+0, typeIndex+1, typeIndex+2, typeIndex+3], frameRate, false);
-            self.sprite.animations.add('upright', [typeIndex+0, typeIndex+1, typeIndex+2, typeIndex+3], frameRate, false);
-            self.sprite.animations.add('downright', [typeIndex+6, typeIndex+5, typeIndex+4, typeIndex+3], frameRate, false);
+            self.sprite.animations.add('right', [typeIndex + 3], frameRate, false);
+            self.sprite.animations.add('leftright', [typeIndex + 9, typeIndex + 10, typeIndex + 11, typeIndex + 0, typeIndex + 1, typeIndex + 2, typeIndex + 3], frameRate, false);
+            self.sprite.animations.add('upright', [typeIndex + 0, typeIndex + 1, typeIndex + 2, typeIndex + 3], frameRate, false);
+            self.sprite.animations.add('downright', [typeIndex + 6, typeIndex + 5, typeIndex + 4, typeIndex + 3], frameRate, false);
 
-            self.sprite.animations.add('left', [typeIndex+9], frameRate, false);
-            self.sprite.animations.add('rightleft', [typeIndex+3, typeIndex+4, typeIndex+5, typeIndex+6, typeIndex+7, typeIndex+8, typeIndex+9], frameRate, false);
-            self.sprite.animations.add('upleft', [typeIndex+0, typeIndex+11, typeIndex+10, typeIndex+9], frameRate, false);
-            self.sprite.animations.add('downleft', [typeIndex+6, typeIndex+7, typeIndex+8, typeIndex+9], frameRate, false);
-            
-            self.sprite.animations.add('up', [typeIndex+0], frameRate, false);
-            self.sprite.animations.add('downup', [typeIndex+6, typeIndex+7, typeIndex+8, typeIndex+9, typeIndex+10, typeIndex+11, typeIndex+0], frameRate, false);
-            self.sprite.animations.add('rightup', [typeIndex+3, typeIndex+2, typeIndex+1, typeIndex+0], frameRate, false);
-            self.sprite.animations.add('leftup', [typeIndex+9, typeIndex+10, typeIndex+11, typeIndex+0], frameRate, false);
-            
-            self.sprite.animations.add('down', [typeIndex+6], frameRate, false);
-            self.sprite.animations.add('updown', [typeIndex+0, typeIndex+1, typeIndex+2, typeIndex+3, typeIndex+4, typeIndex+5, typeIndex+6], frameRate, false);            
-            self.sprite.animations.add('rightdown', [typeIndex+3, typeIndex+4, typeIndex+5, typeIndex+6], frameRate, false);
-            self.sprite.animations.add('leftdown', [typeIndex+9, typeIndex+8, typeIndex+7, typeIndex+6], frameRate, false);
-    
+            self.sprite.animations.add('left', [typeIndex + 9], frameRate, false);
+            self.sprite.animations.add('rightleft', [typeIndex + 3, typeIndex + 4, typeIndex + 5, typeIndex + 6, typeIndex + 7, typeIndex + 8, typeIndex + 9], frameRate, false);
+            self.sprite.animations.add('upleft', [typeIndex + 0, typeIndex + 11, typeIndex + 10, typeIndex + 9], frameRate, false);
+            self.sprite.animations.add('downleft', [typeIndex + 6, typeIndex + 7, typeIndex + 8, typeIndex + 9], frameRate, false);
+
+            self.sprite.animations.add('up', [typeIndex + 0], frameRate, false);
+            self.sprite.animations.add('downup', [typeIndex + 6, typeIndex + 7, typeIndex + 8, typeIndex + 9, typeIndex + 10, typeIndex + 11, typeIndex + 0], frameRate, false);
+            self.sprite.animations.add('rightup', [typeIndex + 3, typeIndex + 2, typeIndex + 1, typeIndex + 0], frameRate, false);
+            self.sprite.animations.add('leftup', [typeIndex + 9, typeIndex + 10, typeIndex + 11, typeIndex + 0], frameRate, false);
+
+            self.sprite.animations.add('down', [typeIndex + 6], frameRate, false);
+            self.sprite.animations.add('updown', [typeIndex + 0, typeIndex + 1, typeIndex + 2, typeIndex + 3, typeIndex + 4, typeIndex + 5, typeIndex + 6], frameRate, false);
+            self.sprite.animations.add('rightdown', [typeIndex + 3, typeIndex + 4, typeIndex + 5, typeIndex + 6], frameRate, false);
+            self.sprite.animations.add('leftdown', [typeIndex + 9, typeIndex + 8, typeIndex + 7, typeIndex + 6], frameRate, false);
+
             self.sprite.animations.add('explode', [48], frameRate, false);
-                        
+
             // enabling ARCADE physics for the  hero
             game.physics.enable(self.sprite, Phaser.Physics.ARCADE);
 
@@ -77,18 +78,32 @@ define([], function () {
         };
 
         self.direction = function () {
-            var vx = self.sprite.body.velocity.x;
-            var vy = self.sprite.body.velocity.y;
-            if (vx > 0 || self.sprite.body.blocked.right)
-                return "right";
-            else if (vx < 0 || self.sprite.body.blocked.left)
-                return "left";
-            else if (vy > 0 || self.sprite.body.blocked.down)
-                return "down";
-            else if (vy < 0 || self.sprite.body.blocked.up)
-                return "up";
-            else
-                return "stop";
+            //best with facing property
+            switch (self.sprite.body.facing) {
+                case Phaser.LEFT:
+                    return "left";
+                case Phaser.RIGHT:
+                    return "right";
+                case Phaser.UP:
+                    return "up";
+                case Phaser.DOWN:
+                    return "down";
+                case Phaser.NONE:
+                default:
+                    return "stop";
+            }
+            // var vx = self.sprite.body.velocity.x;
+            // var vy = self.sprite.body.velocity.y;
+            // if (vx > 0 || self.sprite.body.blocked.right)
+            //     return "right";
+            // else if (vx < 0 || self.sprite.body.blocked.left)
+            //     return "left";
+            // else if (vy > 0 || self.sprite.body.blocked.down)
+            //     return "down";
+            // else if (vy < 0 || self.sprite.body.blocked.up)
+            //     return "up";
+            // else
+            //     return "stop";
         };
 
         self.reset = function () {
@@ -96,7 +111,7 @@ define([], function () {
             self.sprite.y = config.y0;
             self.sprite.animations.play("up");
             if (config.initialFuel !== undefined) {
-                self.fuel = config.initialFuel;   
+                self.fuel = config.initialFuel;
             }
             return self;
         };
@@ -116,7 +131,7 @@ define([], function () {
             if (self.sprite.body.velocity.x < 0) return;
             var sourceDirection = self.direction();
             if (sourceDirection === "stop") sourceDirection = "";
-            self.sprite.animations.play(sourceDirection+"left");
+            self.sprite.animations.play(sourceDirection + "left");
             self.sprite.body.velocity.x = -config.speed;
             self.sprite.body.velocity.y = 0;
             return self;
@@ -125,7 +140,7 @@ define([], function () {
         self.right = function () {
             if (self.sprite.body.velocity.x > 0) return;
             var sourceDirection = self.direction();
-            self.sprite.animations.play(sourceDirection+"right");
+            self.sprite.animations.play(sourceDirection + "right");
             self.sprite.body.velocity.x = config.speed;
             self.sprite.body.velocity.y = 0;
             return self;
@@ -134,7 +149,7 @@ define([], function () {
         self.up = function () {
             if (self.sprite.body.velocity.y < 0) return;
             var sourceDirection = self.direction();
-            self.sprite.animations.play(sourceDirection+"up");
+            self.sprite.animations.play(sourceDirection + "up");
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = -config.speed;
             return self;
@@ -143,26 +158,28 @@ define([], function () {
         self.down = function () {
             if (self.sprite.body.velocity.y > 0) return;
             var sourceDirection = self.direction();
-            self.sprite.animations.play(sourceDirection+"down");
+            self.sprite.animations.play(sourceDirection + "down");
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = config.speed;
             return self;
         };
 
-        self.reverse = function() {
+        self.reverse = function () {
             var direction = self.direction();
             if (direction === "right") {
                 self.left();
-            }
-            else if (direction === "left") {
+            } else if (direction === "left") {
                 self.right();
-            }
-            else if (direction === "down") {
+            } else if (direction === "down") {
                 self.up();
-            }
-            else if (direction === "up") {
+            } else if (direction === "up") {
                 self.down();
             }
+        };
+
+        self.continue = function () {
+            var direction = self.direction();
+            self[direction]();
         };
 
         self.stop = function () {
@@ -216,45 +233,41 @@ define([], function () {
             return map.getTileWorldXY(self.sprite.world.x, self.sprite.world.y, map.tileWidth, map.tileHeight, layer);
         };
 
-        self.update = function(map, layer) {
+        self.update = function (map, layer) {
             if (self.suspended === true) return;
 
             if (self.fuel !== undefined) {
-                self.fuel -= 1/50;
+                self.fuel -= 1 / 50;
             }
-            
+
             self.sprite.game.physics.arcade.collide(self.sprite, layer, function (sprite, tile) {
                 if (sprite.body.blocked.up == true) {
                     if (self.canTurnRight(map, layer)) self.right();
                     else if (self.canTurnLeft(map, layer)) self.left();
                     else if (self.canTurnDown(map, layer)) self.down();
-                }
-                else if (sprite.body.blocked.left == true) {
+                } else if (sprite.body.blocked.left == true) {
                     if (self.canTurnUp(map, layer)) self.up();
                     else if (self.canTurnDown(map, layer)) self.down();
-                    else if (thselfis.canTurnRight(map, layer)) self.right();
-                }
-                else if (sprite.body.blocked.down == true) {
+                    else if (self.canTurnRight(map, layer)) self.right();
+                } else if (sprite.body.blocked.down == true) {
                     if (self.canTurnLeft(map, layer)) self.left();
                     else if (self.canTurnRight(map, layer)) self.right();
                     else if (self.canTurnUp(map, layer)) self.up();
-                }
-                else if (sprite.body.blocked.right == true) {
+                } else if (sprite.body.blocked.right == true) {
                     if (self.canTurnDown(map, layer)) self.down();
                     else if (self.canTurnUp(map, layer)) self.up();
                     else if (self.canTurnLeft(map, layer)) self.left();
-                }
-                else {
+                } else {
                     self.stop();
                 }
             }, null, self);
-    
+
             return self;
         };
 
-        self.follow = function(tile, map, layer) {
+        self.follow = function (tile, map, layer) {
             if (self.suspended === true) return;
-            
+
             var x = tile.worldX + tile.width / 2;
             var y = tile.worldY + tile.height / 2;
 
@@ -265,22 +278,19 @@ define([], function () {
             if (adx > ady) {
                 if (dx > 0) {
                     if (self.canTurnRight(map, layer)) self.right();
-                }
-                else {
+                } else {
                     if (self.canTurnLeft(map, layer)) self.left();
                 }
-            }
-            else {
+            } else {
                 if (dy > 0) {
                     if (self.canTurnDown(map, layer)) self.down();
-                }
-                else {
+                } else {
                     if (self.canTurnUp(map, layer)) self.up();
                 }
             }
         };
 
-        self.delete = function() {
+        self.delete = function () {
             self.sprite.destroy();
         };
 

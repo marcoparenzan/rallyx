@@ -1,6 +1,6 @@
-define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver) {
+define(["gameOptions", "car", "gameover", "staticobject"], function (gameOptions, Car, GameOver, StaticObject) {
 
-    var every = function (self, callback) {
+    var forall = function (self, callback) {
         var keys = Object.keys(self);
         var i = 0;
         while (true) {
@@ -11,16 +11,14 @@ define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver)
         return self;
     };
     
-    var collidesWith = function (self, set, callback) {
+    var collisionAmong = function (self, set, callback) {
         var keys = Object.keys(set);
         var i = 0;
-        var collisionStack = [];
         while (true) {
             if (i === keys.length) break;
             var item = set[keys[i]];
             game.physics.arcade.collide(self.sprite, item.sprite, function (selfsprite, itemsprite) {
-                callback(self, this, collisionStack); // this === item
-                collisionStack.push(this);
+                callback(self, this); // this === item
             }, null, item);
             i++;
         }
@@ -69,12 +67,101 @@ define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver)
             }).preload();
 
             this.nextFlagScore = 100;
-            this.flags = {
-            };
-
+            this.flags = {};
+            this.flags.flags1 = new StaticObject(game, {
+                id: "flags1",
+                x0: 8 * 96 + 48,
+                y0: 9 * 96 + 48,
+                type: "flag"
+            }).preload();
+            this.flags.flags2 = new StaticObject(game, {
+                id: "flags2",
+                x0: 30 * 96 + 48,
+                y0: 14 * 96 + 48,
+                type: "flag"
+            }).preload();
+            this.flags.flags3 = new StaticObject(game, {
+                id: "flags3",
+                x0: 36 * 96 + 48,
+                y0: 49 * 96 + 48,
+                type: "flag"
+            }).preload();
+            this.flags.flags4 = new StaticObject(game, {
+                id: "flags4",
+                x0: 10 * 96 + 48,
+                y0: 46 * 96 + 48,
+                type: "flag"
+            }).preload();
+            this.flags.flags5 = new StaticObject(game, {
+                id: "flags5",
+                x0: 13 * 96 + 48,
+                y0: 26 * 96 + 48,
+                type: "flag"
+            }).preload();
+            this.flags.flags6 = new StaticObject(game, {
+                id: "flags6",
+                x0: 27 * 96 + 48,
+                y0: 28 * 96 + 48,
+                type: "flag"
+            }).preload();
+            this.flags.flags7 = new StaticObject(game, {
+                id: "flags7",
+                x0: 17 * 96 + 48,
+                y0: 42 * 96 + 48,
+                type: "flag"
+            }).preload();
+            this.flags.flags8 = new StaticObject(game, {
+                id: "flags8",
+                x0: 35 * 96 + 48,
+                y0: 18 * 96 + 48,
+                type: "flag"
+            }).preload();
+            this.flags.flags9 = new StaticObject(game, {
+                id: "flags9",
+                x0: 5 * 96 + 48,
+                y0: 23 * 96 + 48,
+                type: "flag"
+            }).preload();
+            this.flags.flags10 = new StaticObject(game, {
+                id: "flags10",
+                x0: 30 * 96 + 48,
+                y0: 33 * 96 + 48,
+                type: "flag"
+            }).preload();
+           
             this.smokes = {};
 
             this.holes = {};
+            this.holes.hole1 = new StaticObject(game, {
+                id: "hole1",
+                x0: 12 * 96 + 48,
+                y0: 4 * 96 + 48,
+                type: "hole"
+            }).preload();
+            this.holes.hole2 = new StaticObject(game, {
+                id: "hole2",
+                x0: 27 * 96 + 48,
+                y0: 31 * 96 + 48,
+                type: "hole"
+            }).preload();
+            this.holes.hole3 = new StaticObject(game, {
+                id: "hole3",
+                x0: 36 * 96 + 48,
+                y0: 43 * 96 + 48,
+                type: "hole"
+            }).preload();
+            this.holes.hole4 = new StaticObject(game, {
+                id: "hole4",
+                x0: 15 * 96 + 48,
+                y0: 22 * 96 + 48,
+                type: "hole"
+            }).preload();            
+            this.holes.hole5 = new StaticObject(game, {
+                id: "hole5",
+                x0: 26 * 96 + 48,
+                y0: 47 * 96 + 48,
+                type: "hole"
+            }).preload();
 
             this.gameOver = new GameOver(game).preload();
         };
@@ -152,10 +239,15 @@ define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver)
             };
 
             this.player.create();
-            every(this.enemies, function (car) {
+            forall(this.enemies, function (car) {
                 car.create();
             });
-
+            forall(this.flags, function (flag) {
+                flag.create();
+            });            
+            forall(this.holes, function (hole) {
+                hole.create();
+            });
             // set workd bounds to allow camera to follow the player
             game.world.setBounds(0, 0, 1008 * 4, 1536 * 4);
 
@@ -165,12 +257,13 @@ define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver)
             this.restart();
         };
 
-        this.catchTheFlag = function() {
+        this.catchTheFlag = function(flag) {
             var self = this;
             self.player.addScore(self.nextFlagScore);
             self.nextFlagScore += 100;
             flag.delete();
             delete self.flags[flag.id];
+            self.player.continue();
         };
 
         this.explodes = function() {
@@ -197,7 +290,7 @@ define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver)
         this.suspend = function () {
             var self = this;
             self.player.suspend();
-            every(this.enemies, function (car) {
+            forall(this.enemies, function (car) {
                 car.suspend();
             });
             self._suspended = true;
@@ -207,14 +300,14 @@ define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver)
             var self = this;
 
             self.player.reset();
-            every(self.enemies, function (car) {
+            forall(self.enemies, function (car) {
                 car.reset();
             });
 
             setTimeout(function(){
                 self.player.restart().up();
                 setTimeout(function() {
-                    every(self.enemies, function (car) {
+                    forall(self.enemies, function (car) {
                         car.restart();
                     });
                 }, 2000);
@@ -231,11 +324,11 @@ define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver)
             if (self._suspended == true) return;
 
             self.player.update(self.map, self.layer);
-            every(self.enemies, function(enemy) { 
+            forall(self.enemies, function(enemy) { 
                 enemy.update(self.map, self.layer); 
             });
-            every(self.flags, function(flag) { flag.update(self.map, self.layer); });
-            every(self.holes, function(hole) { hole.update(self.map, self.layer); });
+            forall(self.flags, function(flag) { flag.update(self.map, self.layer); });
+            forall(self.holes, function(hole) { hole.update(self.map, self.layer); });
 
             // driving
             if (self.targetPlayerTile != undefined) {
@@ -255,28 +348,34 @@ define(["gameOptions", "car", "gameover"], function (gameOptions, Car, GameOver)
                 }
             }
             var playerTile = self.player.getTile(self.map, self.layer);
-            every(this.enemies, function (car) {
+            forall(this.enemies, function (car) {
                 car.follow(playerTile, self.map, self.layer);
             });
 
             // player to enemy collision
-            collidesWith(self.player, self.enemies, function(player, enemy) {
+            collisionAmong(self.player, self.enemies, function(player, enemy) {
                 self.explodes();
             });
 
-            collidesWith(self.player, self.flags, function(player, flag) {
-                self.catchTheFlag();
+            collisionAmong(self.player, self.flags, function(player, flag) {
+                self.catchTheFlag(flag);
+                // enemies pass over flag....
             });
 
-            collidesWith(self.player, self.holes, function(player, hole) {
+            collisionAmong(self.player, self.holes, function(player, hole) {
                 self.explodes();
             });
 
-            every(self.enemies, function(enemy){
+            forall(self.enemies, function(enemy){
 
-                collidesWith(enemy, self.enemies, function(enemy1, enemy2) {
+                collisionAmong(enemy, self.enemies, function(enemy1, enemy2) {
+                    if (enemy1.id === enemy2.id) return;
                     enemy1.reverse();
                     enemy2.reverse();
+                });    
+
+                collisionAmong(enemy, self.holes, function(enemy, hole) {
+                    enemy.reverse(); // enemies does not explode over holes, just reverse
                 });    
 
             });
