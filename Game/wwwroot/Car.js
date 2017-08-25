@@ -226,6 +226,31 @@ define([], function () {
             return map.getTileWorldXY(self.sprite.world.x, self.sprite.world.y, map.tileWidth, map.tileHeight, layer);
         };
 
+        self.follow = function (tile, map, layer) {
+            if (self.suspended === true) return;
+
+            var x = tile.worldX + tile.width / 2;
+            var y = tile.worldY + tile.height / 2;
+
+            var dx = tile.worldX + tile.width / 2 - self.sprite.world.x;
+            var dy = tile.worldY + tile.height / 2 - self.sprite.world.y;
+            var adx = Math.abs(dx);
+            var ady = Math.abs(dy);
+            if (adx > ady) {
+                if (dx > 0) {
+                    if (self.canTurnRight(map, layer)) self.right();
+                } else {
+                    if (self.canTurnLeft(map, layer)) self.left();
+                }
+            } else {
+                if (dy > 0) {
+                    if (self.canTurnDown(map, layer)) self.down();
+                } else {
+                    if (self.canTurnUp(map, layer)) self.up();
+                }
+            }
+        };
+
         self.update = function (map, layer) {
             if (self.suspended === true) return;
 
@@ -257,34 +282,11 @@ define([], function () {
 
             return self;
         };
-
-        self.follow = function (tile, map, layer) {
-            if (self.suspended === true) return;
-
-            var x = tile.worldX + tile.width / 2;
-            var y = tile.worldY + tile.height / 2;
-
-            var dx = tile.worldX + tile.width / 2 - self.sprite.world.x;
-            var dy = tile.worldY + tile.height / 2 - self.sprite.world.y;
-            var adx = Math.abs(dx);
-            var ady = Math.abs(dy);
-            if (adx > ady) {
-                if (dx > 0) {
-                    if (self.canTurnRight(map, layer)) self.right();
-                } else {
-                    if (self.canTurnLeft(map, layer)) self.left();
-                }
-            } else {
-                if (dy > 0) {
-                    if (self.canTurnDown(map, layer)) self.down();
-                } else {
-                    if (self.canTurnUp(map, layer)) self.up();
-                }
-            }
-        };
-
+        
         self.delete = function () {
+            if (self.sprite === undefined) return;
             self.sprite.destroy();
+            self.sprite = undefined;
         };
 
         return self;

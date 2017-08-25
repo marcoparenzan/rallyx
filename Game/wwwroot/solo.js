@@ -1,4 +1,4 @@
-define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions, Car, GameOver, Flag, Rock) {
+define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (gameOptions, Car, GameOver, Flag, Rock, Smoke) {
 
     var forall = function (self, callback) {
         var keys = Object.keys(self);
@@ -19,10 +19,12 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
             if (exit) break;
             if (i === keys.length) break;
             var item = set[keys[i]];
-            game.physics.arcade.collide(self.sprite, item.sprite, function (selfsprite, itemsprite) {
-                callback(self, this); // this === item
-                exit = true;
-            }, null, item);
+            if (item.sprite !== undefined) {
+                game.physics.arcade.collide(self.sprite, item.sprite, function (selfsprite, itemsprite) {
+                    callback(self, this); // this === item
+                    exit = true;
+                }, null, item);
+            }
             i++;
         }
         return self;
@@ -123,6 +125,21 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
             }).preload();
 
             this.smokes = {};
+            this.smokes.smoke1 = new Smoke(game, {
+                id: "smoke1",
+                x0: 0,
+                y0: 0,
+            }).preload();
+            this.smokes.smoke2 = new Smoke(game, {
+                id: "smoke2",
+                x0: 0,
+                y0: 0
+            }).preload();
+            this.smokes.smoke3 = new Smoke(game, {
+                id: "smoke3",
+                x0: 0,
+                y0: 0
+            }).preload();
 
             this.rocks = {};
             this.rocks.rock1 = new Rock(game, {
@@ -191,6 +208,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
             self.playerToUp = false;
             self.playerToRight = false;
             self.playerToDown = false;
+            self.playerSmoking = false;
 
             game.input.keyboard.onDownCallback = function (ev) {
                 switch (ev.keyCode) {
@@ -205,6 +223,9 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
                         break;
                     case 40:
                         self.playerToDown = true;
+                        break;
+                    case 17:
+                        self.playerSmoking = true;
                         break;
                 }
             };
@@ -222,6 +243,9 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
                         break;
                     case 40:
                         self.playerToDown = false;
+                        break;
+                    case 17:
+                        self.playerSmoking = false;
                         break;
                 }
             };
@@ -327,6 +351,11 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
             self.nextFlagScore = 100;
             self.multiplyFlagScore = 1;
 
+            self.playerSmokingCount = undefined;
+            forall(self.smokes, function (smoke) {
+                smoke.delete();
+            });
+
             self.player.reset();
             forall(self.enemies, function (car) {
                 car.reset();
@@ -380,10 +409,34 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
                     if (self.player.canTurnDown(self.map, self.layer)) self.player.down();
                 }
             }
+
+            if (self.playerSmoking === true && self.playerSmokingCount === undefined) {
+                self.playerSmokingCount = 3;
+                // so if not yet started smoking...start counter
+            }
+
             var playerTile = self.player.getTile(self.map, self.layer);
+            // track when player changes tile
+            var newPlayerTile = false;
+            if (self.lastPlayerTile === undefined) newPlayerTile = true;
+            else if (self.lastPlayerTile.x !== playerTile.x || self.lastPlayerTile.y !== playerTile.y) newPlayerTile = true;
+
             forall(this.enemies, function (car) {
                 car.follow(playerTile, self.map, self.layer);
             });
+
+            if (newPlayerTile === true) {
+                // on the last, add the smoke if
+                if (self.playerSmokingCount > 0) { // else is undefined so nothing to do
+                    self.smokes["smoke" + self.playerSmokingCount].show(self.lastPlayerTile.x * 96 + 48, self.lastPlayerTile.y * 96 + 48);
+                    // add smoke to the last player position
+                    self.playerSmokingCount--;
+                    if (self.playerSmokingCount === 0) self.playerSmokingCount = undefined; // disable smoking
+                }
+
+                // save the changed tile
+                self.lastPlayerTile = playerTile;
+            }
 
             // player to enemy collision
             collisionAmong(self.player, self.enemies, function (player, enemy) {
@@ -410,6 +463,11 @@ define(["gameOptions", "car", "gameover", "flag", "rock"], function (gameOptions
                 collisionAmong(enemy, self.rocks, function (enemy, rock) {
                     enemy.reverse(); // enemies does not explode over rocks, just reverse
                 });
+
+                collisionAmong(enemy, self.smokes, function (enemy, smoke) {
+                    enemy.reverse(); // enemies does not explode over smoke, just reverse
+                });
+
 
             });
         };

@@ -31,7 +31,9 @@ define([], function () {
         };
 
         self.delete = function() {
+            if (self.sprite === undefined) return;
             self.sprite.destroy();
+            self.sprite = undefined;
         };
 
         return self;

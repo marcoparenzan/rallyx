@@ -56,10 +56,6 @@ define([], function () {
             return self;
         };
         
-        self.update = function(map, layer) {
-            return self;
-        };
-        
         self.doubleValue = function() {
             return config.doubleValue || false;
         };
@@ -68,8 +64,18 @@ define([], function () {
             self.sprite.animations.play(value + (double == true ? "x2" : ""));
             self.sprite.body.enable = false;
             setTimeout(function(){
-                self.sprite.destroy();
+                self.delete();
             }, 2000);
+        };
+                  
+        self.update = function(map, layer) {
+            return self;
+        };
+      
+        self.delete = function() {
+            if (self.sprite === undefined) return;
+            self.sprite.destroy();
+            self.sprite = undefined;
         };
 
         return self;
