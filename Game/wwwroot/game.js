@@ -15,9 +15,7 @@ requirejs([
         this.preload = function () {
             game.scale.pageAlignHorizontally = true;
             game.scale.pageAlignVertically = true;
-            // game.stage.disableVisibilityChange = true;
-            // game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            // game.scale.setScreenSize(true);
+            game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 
             //game.load.audio('default', ['captured.wav']);
         };
