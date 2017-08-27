@@ -271,11 +271,13 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "
             self.hudGraphics = game.add.graphics(1088, 0);
             self.hudGraphics.fixedToCamera = true;
 
-            self.hudHighScoreText = game.add.text(1088, 22, (gameOptions.highScore || 0), { font: "14px Courier New", fill: "#ffff00" });
+            self.hudHighScoreText = game.add.text(1280, 22, (gameOptions.highScore || 0), { font: "28px Courier", fill: "#ffff00", align: "right"  });
             self.hudHighScoreText.fixedToCamera = true;
+            self.hudHighScoreText.anchor.x = 1;
 
-            self.hudScoreText = game.add.text(1088, 71, "SCORE", { font: "14px Courier New", fill: "#ffff00" });
+            self.hudScoreText = game.add.text(1280, 71, "SCORE", { font: "28px Courier", fill: "#ffff00", align: "right" });
             self.hudScoreText.fixedToCamera = true;
+            self.hudScoreText.anchor.x = 1;
             
             self.restart();
         };
@@ -406,14 +408,11 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "
 
         this.render = function () {
             var self = this;
-            if (self.player !== undefined) {
-                game.debug.text("Player 1 | Score " + self.player.score + " | Lives " + self.player.lives + " | Fuel " + parseInt(self.player.fuel), 30, 30);
-            }
 
             self.hudGraphics.clear();
 
-            self.hudGraphics.beginFill(0xffff00, 1);
             var fuelx = self.player.fuel * 192 / 100;
+            self.hudGraphics.beginFill(0xffff00, 1);
             self.hudGraphics.drawRect(192-fuelx, 194, fuelx, 20);
             self.hudGraphics.endFill();
 
@@ -429,6 +428,12 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "
             forall(self.flags, function (flag) {
                 self.hudSprite(flag, 0xffff00, 0, 240);
             });
+
+            // hude 2UP
+            self.hudGraphics.beginFill(0x000000, 1);
+            self.hudGraphics.drawRect(0, 94, 192, 36);
+            self.hudGraphics.endFill();
+
         };
 
         this.update = function () {
