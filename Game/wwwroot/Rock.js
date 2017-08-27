@@ -3,7 +3,6 @@ define([], function () {
         var self = this;
         
         self.preload = function () {
-            game.load.spritesheet("rock", "assets/rock-spritesheet.png", 64, 64);
             return self;
         };
 

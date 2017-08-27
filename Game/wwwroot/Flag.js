@@ -4,7 +4,6 @@ define([], function () {
         self.id = config.id;
 
         self.preload = function () {
-            game.load.spritesheet("flag", "assets/flag-spritesheet.png", 64, 64);
             return self;
         };
 

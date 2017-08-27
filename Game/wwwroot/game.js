@@ -9,7 +9,7 @@ requirejs([
 ], function (gameOptions,
     Solo
 ) {
-    game = new Phaser.Game(gameOptions.gameWidth, gameOptions.gameHeight, null, "game");
+    game = new Phaser.Game(gameOptions.gameWidth, gameOptions.gameHeight, Phaser.CANVAS, "Rally-X");
 
     var Init = function (game) {
         this.preload = function () {

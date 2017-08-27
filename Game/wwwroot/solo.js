@@ -1,4 +1,4 @@
-define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], function (gameOptions, Car, GameOver, Flag, Rock, Smoke, Pendings) {
+define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "hud"], function (gameOptions, Car, GameOver, Flag, Rock, Smoke, Pendings, Hud) {
 
     var forall = function (self, callback) {
         var keys = Object.keys(self);
@@ -36,7 +36,12 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], 
             game.load.tilemap("default", 'assets/rallyx-map.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image("default", "assets/rallyx-map-tileset.png");
 
+            game.load.spritesheet("hud", "assets/hud.png", 192, 672);
+            
+            game.load.spritesheet("flag", "assets/flag-spritesheet.png", 64, 64);
+            game.load.spritesheet("rock", "assets/rock-spritesheet.png", 64, 64);
             game.load.spritesheet("smoke", "assets/smoke-spritesheet.png", 64, 64);
+            game.load.spritesheet("gameover", "assets/gameover-spritesheet.png", 64, 64);
 
             this.player = new Car(game, {
                 id: "player1",
@@ -156,7 +161,16 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], 
                 y0: 47 * 96 + 48
             }).preload();
 
+            this.hud = new Hud(game, {
+                x0: 1088, 
+                y0: 0
+            }).preload();
+
             this.gameOver = new GameOver(game).preload();
+        };
+
+        this.getTile = function (x, y) {
+            return this.map.getTileWorldXY(x, y, this.map.tileWidth, this.map.tileHeight, this.layer);
         };
 
         this.create = function () {
@@ -175,10 +189,6 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], 
             // tile 1 (the black tile) has the collision enabled
             self.map.setCollisionBetween(2, 40, true);
 
-            var getTile = function (x, y) {
-                return self.map.getTileWorldXY(x, y, self.map.tileWidth, self.map.tileHeight, self.layer);
-            };
-
             self.targetPlayerTile = undefined;
 
             game.input.onUp.add(function (e) {
@@ -187,11 +197,11 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], 
             });
 
             game.input.onHold.add(function (e) {
-                self.targetPlayerTile = getTile(game.input.worldX, game.input.worldY);
+                self.targetPlayerTile = self.getTile(game.input.worldX, game.input.worldY);
             });
 
             game.input.onDown.add(function (e) {
-                self.targetPlayerTile = getTile(game.input.worldX, game.input.worldY);
+                self.targetPlayerTile = self.getTile(game.input.worldX, game.input.worldY);
             }, self);
 
             self.playerToLeft = false;
@@ -256,7 +266,26 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], 
             // making the camera follow the player
             game.camera.follow(self.player.sprite, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
 
-            this.restart();
+            self.hud.create();
+            
+            self.hudGraphics = game.add.graphics(1088, 0);
+            self.hudGraphics.fixedToCamera = true;
+
+            self.hudHighScoreText = game.add.text(1088, 22, (gameOptions.highScore || 0), { font: "14px Courier New", fill: "#ffff00" });
+            self.hudHighScoreText.fixedToCamera = true;
+
+            self.hudScoreText = game.add.text(1088, 71, "SCORE", { font: "14px Courier New", fill: "#ffff00" });
+            self.hudScoreText.fixedToCamera = true;
+            
+            self.restart();
+        };
+
+        this.hudSprite = function (obj, color, startx, starty) {
+            var self = this;
+            var tile = self.getTile(obj.sprite.x, obj.sprite.y);
+            self.hudGraphics.beginFill(color, 1);
+            self.hudGraphics.drawRect(tile.x * 5 + 0 + (startx || 0), tile.y * 5 + 0 + (starty || 0), 5, 5);
+            self.hudGraphics.endFill();
         };
 
         this.catchTheFlag = function (flag) {
@@ -375,10 +404,30 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], 
             self.suspended = false;
         };
 
+        this.render = function () {
+            var self = this;
+            if (self.player !== undefined) {
+                game.debug.text("Player 1 | Score " + self.player.score + " | Lives " + self.player.lives + " | Fuel " + parseInt(self.player.fuel), 30, 30);
+            }
+
+            self.hudGraphics.clear();
+
+            self.hudGraphics.beginFill(0xffff00, 1);
+            var fuelx = self.player.fuel * 192 / 100;
+            self.hudGraphics.drawRect(192-fuelx, 194, fuelx, 20);
+            self.hudGraphics.endFill();
+
+            self.hudSprite(self.player, 0xffffff, 0, 240);
+            forall(self.enemies, function (enemy) {
+                self.hudSprite(enemy, 0xff0000, 0, 240);
+            });
+            forall(self.flags, function (flag) {
+                self.hudSprite(flag, 0xffff00, 0, 240);
+            });
+        };
+
         this.update = function () {
             var self = this;
-
-            game.debug.text("Player 1 | Score " + self.player.score + " | Lives " + self.player.lives + " | Fuel " + parseInt(self.player.fuel), 10, 10);
 
             if (self.suspended == true) return;
 
@@ -493,6 +542,11 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], 
 
 
             });
+
+
+            // update hud
+
+            self.hudScoreText.text = self.player.score;
         };
     };
 });
