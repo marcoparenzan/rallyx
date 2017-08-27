@@ -452,7 +452,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], 
                     });
 
                     // add smoke to the last player position
-                    self.player.fuel--;            
+                    self.player.fuel--;
                     self.playerSmokingCount--;
                     if (self.playerSmokingCount === 0) self.playerSmokingCount = undefined; // disable smoking
                 }
