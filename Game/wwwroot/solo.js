@@ -50,7 +50,8 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "
                 speed: 400,
                 initialScore: 0,
                 initialLives: 3,
-                initialFuel: 100
+                initialFuel: 100,
+                type: 2
             }).preload();
 
             this.enemies = {};
@@ -59,7 +60,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "
                 x0: 18 * 96 + 48,
                 y0: 57 * 96 + 48,
                 speed: 400,
-                type: 1
+                type: 3
             }).preload();
 
             this.enemies.enemy2 = new Car(game, {
@@ -67,7 +68,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "
                 x0: 20 * 96 + 48,
                 y0: 57 * 96 + 48,
                 speed: 400,
-                type: 1
+                type: 3
             }).preload();
 
             this.enemies.enemy3 = new Car(game, {
@@ -75,7 +76,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "
                 x0: 22 * 96 + 48,
                 y0: 57 * 96 + 48,
                 speed: 400,
-                type: 1
+                type: 3
             }).preload();
 
             this.flags = {};
