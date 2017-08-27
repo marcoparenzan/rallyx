@@ -63,9 +63,6 @@ define([], function () {
         self.catch = function(value, double) {
             self.sprite.animations.play(value + (double == true ? "x2" : ""));
             self.sprite.body.enable = false;
-            setTimeout(function(){
-                self.delete();
-            }, 2000);
         };
                   
         self.update = function(map, layer) {

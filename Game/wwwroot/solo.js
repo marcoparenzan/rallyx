@@ -1,4 +1,4 @@
-define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (gameOptions, Car, GameOver, Flag, Rock, Smoke) {
+define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "Pendings"], function (gameOptions, Car, GameOver, Flag, Rock, Smoke, Pendings) {
 
     var forall = function (self, callback) {
         var keys = Object.keys(self);
@@ -35,6 +35,8 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (ga
         this.preload = function () {
             game.load.tilemap("default", 'assets/rallyx-map.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image("default", "assets/rallyx-map-tileset.png");
+
+            game.load.spritesheet("smoke", "assets/smoke-spritesheet.png", 64, 64);
 
             this.player = new Car(game, {
                 id: "player1",
@@ -125,21 +127,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (ga
             }).preload();
 
             this.smokes = {};
-            this.smokes.smoke1 = new Smoke(game, {
-                id: "smoke1",
-                x0: 0,
-                y0: 0,
-            }).preload();
-            this.smokes.smoke2 = new Smoke(game, {
-                id: "smoke2",
-                x0: 0,
-                y0: 0
-            }).preload();
-            this.smokes.smoke3 = new Smoke(game, {
-                id: "smoke3",
-                x0: 0,
-                y0: 0
-            }).preload();
+            this.smokecounter = 2;
 
             this.rocks = {};
             this.rocks.rock1 = new Rock(game, {
@@ -173,6 +161,8 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (ga
 
         this.create = function () {
             var self = this;
+
+            self.pendings = new Pendings(game);
 
             game.stage.backgroundColor = gameOptions.bgColor;
 
@@ -277,10 +267,17 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (ga
             }
             self.player.addScore(self.nextFlagScore * self.multiplyFlagScore);
             flag.catch(self.nextFlagScore, self.multiplyFlagScore === 2);
-            delete self.flags[flag.id];
+            delete self.flags[flag.id]; // flag already removed because no other collision!
             if (self.flags.length === 0) {
                 self.gameover();
             } else {
+
+                self.pendings.schedule(function (args) {
+                    args.flag.delete();
+                }, 3000, {
+                    flag: flag
+                });
+
                 self.nextFlagScore += 100;
                 self.continue();
             }
@@ -288,39 +285,48 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (ga
 
         this.gameover = function () {
             var self = this;
-            setTimeout(function () {
-                // game over
+
+            self.pendings.schedule(function () {
+
                 self.gameOver.show(self.player.sprite.x, self.player.sprite.y);
+                self.pendings.complete();
                 var timer = setInterval(function () {
                     if (self.player.fuel > 0) {
                         self.player.addScore(10);
                         self.player.fuel--;
                     } else {
                         clearInterval(timer);
-                        setTimeout(function () {
+
+                        self.pendings.schedule(function () {
                             game.state.start("title");
                         }, 1000);
                     }
                 }, 25);
+
             }, 500);
+
         };
 
         this.explodes = function () {
             var self = this;
+            self.pendings.complete();
             self.suspend();
             self.player.explode();
             if (self.player.lives === 0) {
                 self.gameover();
             } else {
                 // crash
-                setTimeout(function () {
-                    self.restart();
+                self.pendings.schedule(function () {
+                    forall(self.enemies, function (car) {
+                        self.restart();
+                    });
                 }, 1000);
             }
         };
 
         this.suspend = function () {
             var self = this;
+
             self.player.suspend();
             forall(this.enemies, function (car) {
                 car.suspend();
@@ -333,7 +339,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (ga
             self.suspended = false;
             self.player.continue();
             if (enemiesDelayed == true) {
-                setTimeout(function () {
+                self.pendings.schedule(function () {
                     forall(self.enemies, function (car) {
                         car.continue();
                     });
@@ -361,7 +367,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (ga
                 car.reset();
             });
 
-            setTimeout(function () {
+            self.pendings.schedule(function () {
                 self.continue(true);
                 self.player.up();
             }, 2000);
@@ -428,8 +434,25 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke"], function (ga
             if (newPlayerTile === true) {
                 // on the last, add the smoke if
                 if (self.playerSmokingCount > 0) { // else is undefined so nothing to do
-                    self.smokes["smoke" + self.playerSmokingCount].show(self.lastPlayerTile.x * 96 + 48, self.lastPlayerTile.y * 96 + 48);
+                    self.smokecounter++;
+                    var id = "smoke" + self.smokecounter;
+                    var smoke = new Smoke(game, {
+                        id: id,
+                        x0: self.lastPlayerTile.x * 96 + 48,
+                        y0: self.lastPlayerTile.y * 96 + 48
+                    }).preload().create();
+                    self.smokes[smoke.id] = smoke;
+
+                    self.pendings.schedule(function (args) {
+                        args.smoke.delete();
+                        delete self.smokes[args.smokeId];
+                    }, 3000, {
+                        smoke: smoke,
+                        smokeId: smoke.id
+                    });
+
                     // add smoke to the last player position
+                    self.player.fuel--;            
                     self.playerSmokingCount--;
                     if (self.playerSmokingCount === 0) self.playerSmokingCount = undefined; // disable smoking
                 }

@@ -4,16 +4,12 @@ define([], function () {
         self.id = config.id;
 
         self.preload = function () {
-            game.load.spritesheet("smoke", "assets/smoke-spritesheet.png", 64, 64);
+            // game.load.spritesheet("smoke", "assets/smoke-spritesheet.png", 64, 64);
             return self;
         };
 
         self.create = function () {
-            return self.show(config.x0, config.y0, config.type);
-        };
-
-        self.show = function (x, y) {
-            self.sprite = game.add.sprite(x, y, "smoke");
+            self.sprite = game.add.sprite(config.x0, config.y0, "smoke");
 
             var frameRate = 20;
             
@@ -28,19 +24,7 @@ define([], function () {
 
             self.sprite.animations.play("smoke");
 
-            setTimeout(function(){
-                self.delete();
-            }, 5000);
-            
             return self;
-        };
-        
-        self.smoked = function() {
-            if (self.sprite === undefined) return;
-            self.sprite.body.enable = false;
-            setTimeout(function(){
-                self.delete();
-            }, 1000);
         };
         
         self.update = function(map, layer) {

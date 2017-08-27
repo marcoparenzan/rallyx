@@ -55,6 +55,7 @@ requirejs([
             // handle keyboard
             game.input.keyboard.onDownCallback = function (ev) {
                 switch (ev.keyCode) {
+                    case 17:
                     case 32:
                         self.start();
                         break;
