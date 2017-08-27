@@ -36,7 +36,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "
             game.load.tilemap("default", 'assets/rallyx-map.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image("default", "assets/rallyx-map-tileset.png");
 
-            game.load.spritesheet("hud", "assets/hud.png", 192, 672);
+            game.load.spritesheet("hud", "assets/hud.png", 192, 960);
             
             game.load.spritesheet("flag", "assets/flag-spritesheet.png", 64, 64);
             game.load.spritesheet("rock", "assets/rock-spritesheet.png", 64, 64);
@@ -415,6 +415,11 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "pendings", "
             self.hudGraphics.beginFill(0xffff00, 1);
             var fuelx = self.player.fuel * 192 / 100;
             self.hudGraphics.drawRect(192-fuelx, 194, fuelx, 20);
+            self.hudGraphics.endFill();
+
+            var livesx = self.player.lives * 48;
+            self.hudGraphics.beginFill(0x000000, 1);
+            self.hudGraphics.drawRect(livesx, 575, 192-livesx, 36);
             self.hudGraphics.endFill();
 
             self.hudSprite(self.player, 0xffffff, 0, 240);
