@@ -7,7 +7,7 @@ define([], function () {
             self.lives = config.initialLives;
 
             self.explode = function () {
-                self.sprite.animations.play("explode");
+                self.animate("explode");
                 self.lives--;
                 return self;
             };
@@ -55,6 +55,8 @@ define([], function () {
             self.sprite.animations.add('rightdown', [typeIndex + 3, typeIndex + 4, typeIndex + 5, typeIndex + 6], frameRate, false);
             self.sprite.animations.add('leftdown', [typeIndex + 9, typeIndex + 8, typeIndex + 7, typeIndex + 6], frameRate, false);
 
+            self.sprite.animations.add('roll', [typeIndex + 0, typeIndex + 1, typeIndex + 2, typeIndex + 3, typeIndex + 4, typeIndex + 5, typeIndex + 6], frameRate, true);
+            
             self.sprite.animations.add('explode', [48], frameRate, false);
 
             // enabling ARCADE physics for the  hero
@@ -70,7 +72,6 @@ define([], function () {
         };
 
         self.direction = function () {
-            //best with facing property
             switch (self.sprite.body.facing) {
                 case Phaser.LEFT:
                     return "left";
@@ -84,18 +85,6 @@ define([], function () {
                 default:
                     return "stop";
             }
-            // var vx = self.sprite.body.velocity.x;
-            // var vy = self.sprite.body.velocity.y;
-            // if (vx > 0 || self.sprite.body.blocked.right)
-            //     return "right";
-            // else if (vx < 0 || self.sprite.body.blocked.left)
-            //     return "left";
-            // else if (vy > 0 || self.sprite.body.blocked.down)
-            //     return "down";
-            // else if (vy < 0 || self.sprite.body.blocked.up)
-            //     return "up";
-            // else
-            //     return "stop";
         };
 
         self.reset = function () {
@@ -104,7 +93,7 @@ define([], function () {
             if (config.initialFuel !== undefined) {
                 self.fuel = config.initialFuel;
             }
-            self.sprite.animations.play("up");
+            self.animate("up");
             // self.sprite.body.facing = Phaser.UP;
             return self;
         };
@@ -115,18 +104,30 @@ define([], function () {
             return self;
         };
 
-        self.continue = function () {
+        self.continue = function (direction) {
             self.suspended = false;
-            var direction = self.direction();
+            direction = direction || self.direction();
             self[direction]();
             return self;
+        };
+
+        self.animate = function(name) {
+            var newAnimation = self.sprite.animations.getAnimation(name);
+            if (self.currentAnimation !== undefined) {
+                if (self.currentAnimation.isFinished === false) {
+                    self.currentAnimation.stop();
+                    self.currentAnimation = undefined;
+                }
+            }
+            newAnimation.play();
+            self.currentAnimation = newAnimation;
         };
 
         self.left = function () {
             var sourceDirection = self.direction();
             if (sourceDirection === "left" && self.sprite.body.velocity.x<0) return;
-            if (sourceDirection === "stop") sourceDirection = "";
-            self.sprite.animations.play(sourceDirection + "left");
+            if (sourceDirection === "stop" || sourceDirection === "left") sourceDirection = "";
+            self.animate(sourceDirection + "left");
             self.sprite.body.velocity.x = -config.speed;
             self.sprite.body.velocity.y = 0;
             return self;
@@ -135,8 +136,8 @@ define([], function () {
         self.right = function () {
             var sourceDirection = self.direction();
             if (sourceDirection === "right" && self.sprite.body.velocity.x>0) return;
-            if (sourceDirection === "stop") sourceDirection = "";
-            self.sprite.animations.play(sourceDirection + "right");
+            if (sourceDirection === "stop" || sourceDirection === "right") sourceDirection = "";
+            self.animate(sourceDirection + "right");
             self.sprite.body.velocity.x = config.speed;
             self.sprite.body.velocity.y = 0;
             return self;
@@ -145,8 +146,8 @@ define([], function () {
         self.up = function () {
             var sourceDirection = self.direction();
             if (sourceDirection === "up" && self.sprite.body.velocity.y<0) return;
-            if (sourceDirection === "stop") sourceDirection = "";
-            self.sprite.animations.play(sourceDirection + "up");
+            if (sourceDirection === "stop" || sourceDirection === "up") sourceDirection = "";
+            self.animate(sourceDirection + "up");
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = -config.speed;
             return self;
@@ -155,8 +156,8 @@ define([], function () {
         self.down = function () {
             var sourceDirection = self.direction();
             if (sourceDirection === "down" && self.sprite.body.velocity.y>0) return;
-            if (sourceDirection === "stop") sourceDirection = "";
-            self.sprite.animations.play(sourceDirection + "down");
+            if (sourceDirection === "stop" || sourceDirection === "down") sourceDirection = "";
+            self.animate(sourceDirection + "down");
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = config.speed;
             return self;
@@ -258,7 +259,7 @@ define([], function () {
                 self.fuel -= 1 / 50;
             }
 
-            self.sprite.game.physics.arcade.collide(self.sprite, layer, function (sprite, tile) {
+            game.physics.arcade.collide(self.sprite, layer, function (sprite, tile) {
                 if (sprite.body.blocked.up == true) {
                     if (self.canTurnRight(map, layer)) self.right();
                     else if (self.canTurnLeft(map, layer)) self.left();
@@ -287,6 +288,12 @@ define([], function () {
             if (self.sprite === undefined) return;
             self.sprite.destroy();
             self.sprite = undefined;
+        };
+
+        self.smoked = function() {
+            self.suspend();
+            self.animate("roll");
+            return self;
         };
 
         return self;
