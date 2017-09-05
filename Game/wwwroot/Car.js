@@ -1,12 +1,12 @@
 // 2017.08.24 code works, but look at https://phaser.io/tutorials/coding-tips-005 to improve the grid testing
-define([], function () {
-    return function (game, config) {
+define([], function() {
+    return function(game, config) {
         var self = this;
         self.suspended = true;
         if (config.initialLives !== undefined) {
             self.lives = config.initialLives;
 
-            self.explode = function () {
+            self.explode = function() {
                 self.animate("explode");
                 self.lives--;
                 return self;
@@ -15,13 +15,13 @@ define([], function () {
         if (config.initialScore !== undefined) {
             self.score = config.initialScore;
 
-            self.addScore = function (value) {
+            self.addScore = function(value) {
                 self.score += value;
                 return self;
             };
         }
 
-        self.create = function () {
+        self.create = function() {
 
             var typeIndex = (config.type || 0) * 12;
 
@@ -51,7 +51,7 @@ define([], function () {
             self.sprite.animations.add('leftdown', [typeIndex + 9, typeIndex + 8, typeIndex + 7, typeIndex + 6], frameRate, false);
 
             self.sprite.animations.add('roll', [typeIndex + 0, typeIndex + 1, typeIndex + 2, typeIndex + 3, typeIndex + 4, typeIndex + 5, typeIndex + 6], frameRate, true);
-            
+
             self.sprite.animations.add('explode', [48], frameRate, false);
 
             // enabling ARCADE physics for the  hero
@@ -66,7 +66,7 @@ define([], function () {
             return self;
         };
 
-        self.direction = function () {
+        self.direction = function() {
             switch (self.sprite.body.facing) {
                 case Phaser.LEFT:
                     return "left";
@@ -76,13 +76,13 @@ define([], function () {
                     return "up";
                 case Phaser.DOWN:
                     return "down";
-                // case Phaser.NONE:
+                    // case Phaser.NONE:
                 default:
                     return "stop";
             }
         };
 
-        self.reset = function () {
+        self.reset = function() {
             self.sprite.x = config.x0;
             self.sprite.y = config.y0;
             if (config.initialFuel !== undefined) {
@@ -93,13 +93,13 @@ define([], function () {
             return self;
         };
 
-        self.suspend = function () {
+        self.suspend = function() {
             self.stop();
             self.suspended = true;
             return self;
         };
 
-        self.continue = function (direction) {
+        self.continue = function(direction) {
             self.suspended = false;
             direction = direction || self.direction();
             self[direction]();
@@ -118,9 +118,9 @@ define([], function () {
             self.currentAnimation = newAnimation;
         };
 
-        self.left = function () {
+        self.left = function() {
             var sourceDirection = self.direction();
-            if (sourceDirection === "left" && self.sprite.body.velocity.x<0) return;
+            if (sourceDirection === "left" && self.sprite.body.velocity.x < 0) return;
             if (sourceDirection === "stop" || sourceDirection === "left") sourceDirection = "";
             self.animate(sourceDirection + "left");
             self.sprite.body.velocity.x = -config.speed;
@@ -128,9 +128,9 @@ define([], function () {
             return self;
         };
 
-        self.right = function () {
+        self.right = function() {
             var sourceDirection = self.direction();
-            if (sourceDirection === "right" && self.sprite.body.velocity.x>0) return;
+            if (sourceDirection === "right" && self.sprite.body.velocity.x > 0) return;
             if (sourceDirection === "stop" || sourceDirection === "right") sourceDirection = "";
             self.animate(sourceDirection + "right");
             self.sprite.body.velocity.x = config.speed;
@@ -138,9 +138,9 @@ define([], function () {
             return self;
         };
 
-        self.up = function () {
+        self.up = function() {
             var sourceDirection = self.direction();
-            if (sourceDirection === "up" && self.sprite.body.velocity.y<0) return;
+            if (sourceDirection === "up" && self.sprite.body.velocity.y < 0) return;
             if (sourceDirection === "stop" || sourceDirection === "up") sourceDirection = "";
             self.animate(sourceDirection + "up");
             self.sprite.body.velocity.x = 0;
@@ -148,9 +148,9 @@ define([], function () {
             return self;
         };
 
-        self.down = function () {
+        self.down = function() {
             var sourceDirection = self.direction();
-            if (sourceDirection === "down" && self.sprite.body.velocity.y>0) return;
+            if (sourceDirection === "down" && self.sprite.body.velocity.y > 0) return;
             if (sourceDirection === "stop" || sourceDirection === "down") sourceDirection = "";
             self.animate(sourceDirection + "down");
             self.sprite.body.velocity.x = 0;
@@ -158,14 +158,14 @@ define([], function () {
             return self;
         };
 
-        self.stop = function () {
+        self.stop = function() {
             self.sprite.body.velocity.x = 0;
             self.sprite.body.velocity.y = 0;
             self.sprite.animations.stop();
             return self;
         };
 
-        self.reverse = function () {
+        self.reverse = function() {
             var direction = self.direction();
             if (direction === "right") {
                 self.left();
@@ -178,7 +178,7 @@ define([], function () {
             }
         };
 
-        self.canTurnLeft = function (map, layer) {
+        self.canTurnLeft = function(map, layer) {
             var tile1 = self.getTile(map, layer);
             var tile = map.getTileLeft(map.currentLayer, tile1.x, tile1.y);
             if (tile == undefined) return false;
@@ -188,7 +188,7 @@ define([], function () {
             return true;
         };
 
-        self.canTurnRight = function (map, layer) {
+        self.canTurnRight = function(map, layer) {
             var tile1 = self.getTile(map, layer);
             var tile = map.getTileRight(map.currentLayer, tile1.x, tile1.y);
             if (tile == undefined) return false;
@@ -198,7 +198,7 @@ define([], function () {
             return true;
         };
 
-        self.canTurnUp = function (map, layer) {
+        self.canTurnUp = function(map, layer) {
             var tile1 = self.getTile(map, layer);
             var tile = map.getTileAbove(map.currentLayer, tile1.x, tile1.y);
             if (tile == undefined) return false;
@@ -208,7 +208,7 @@ define([], function () {
             return true;
         };
 
-        self.canTurnDown = function (map, layer) {
+        self.canTurnDown = function(map, layer) {
             var tile1 = self.getTile(map, layer);
             var tile = map.getTileBelow(map.currentLayer, tile1.x, tile1.y);
             if (tile == undefined) return false;
@@ -218,11 +218,11 @@ define([], function () {
             return true;
         };
 
-        self.getTile = function (map, layer) {
+        self.getTile = function(map, layer) {
             return map.getTileWorldXY(self.sprite.world.x, self.sprite.world.y, map.tileWidth, map.tileHeight, layer);
         };
 
-        self.follow = function (tile, map, layer) {
+        self.follow = function(tile, map, layer) {
             if (self.suspended === true) return;
 
             var x = tile.worldX + tile.width / 2;
@@ -247,27 +247,27 @@ define([], function () {
             }
         };
 
-        self.update = function (map, layer) {
+        self.update = function(map, layer) {
             if (self.suspended === true) return;
 
             if (self.fuel !== undefined) {
                 self.fuel -= 1 / 50;
             }
 
-            game.physics.arcade.collide(self.sprite, layer, function (sprite, tile) {
-                if (sprite.body.blocked.up == true) {
+            game.physics.arcade.collide(self.sprite, layer, function(sprite, tile) {
+                if (sprite.body.blocked.up === true) {
                     if (self.canTurnRight(map, layer)) self.right();
                     else if (self.canTurnLeft(map, layer)) self.left();
                     else if (self.canTurnDown(map, layer)) self.down();
-                } else if (sprite.body.blocked.left == true) {
+                } else if (sprite.body.blocked.left === true) {
                     if (self.canTurnUp(map, layer)) self.up();
                     else if (self.canTurnDown(map, layer)) self.down();
                     else if (self.canTurnRight(map, layer)) self.right();
-                } else if (sprite.body.blocked.down == true) {
+                } else if (sprite.body.blocked.down === true) {
                     if (self.canTurnLeft(map, layer)) self.left();
                     else if (self.canTurnRight(map, layer)) self.right();
                     else if (self.canTurnUp(map, layer)) self.up();
-                } else if (sprite.body.blocked.right == true) {
+                } else if (sprite.body.blocked.right === true) {
                     if (self.canTurnDown(map, layer)) self.down();
                     else if (self.canTurnUp(map, layer)) self.up();
                     else if (self.canTurnLeft(map, layer)) self.left();
@@ -278,8 +278,8 @@ define([], function () {
 
             return self;
         };
-        
-        self.delete = function () {
+
+        self.delete = function() {
             if (self.sprite === undefined) return;
             self.sprite.destroy();
             self.sprite = undefined;

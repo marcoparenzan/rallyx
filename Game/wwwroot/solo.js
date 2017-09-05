@@ -617,7 +617,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
 
         this.updateTasks = function() {
             var self = this;
-            if (self.scheduledTasks.length == 0) return;
+            if (self.scheduledTasks.length === 0) return;
             for (var i = self.scheduledTasks.length - 1; i >= 0; i--) {
                 var task = self.scheduledTasks[i];
                 if (game.time.time < task.runAfter) continue;
