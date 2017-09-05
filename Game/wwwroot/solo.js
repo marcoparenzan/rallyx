@@ -176,52 +176,52 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
                 x0: 20 * 96 + 48,
                 y0: 50 * 96 + 48
             }).create();
-            // this.flags.flags2 = new Flag(game, {
-            //     id: "flags2",
-            //     x0: 30 * 96 + 48,
-            //     y0: 14 * 96 + 48
-            // }).create();
-            // this.flags.flags3 = new Flag(game, {
-            //     id: "flags3",
-            //     x0: 36 * 96 + 48,
-            //     y0: 49 * 96 + 48
-            // }).create();
-            // this.flags.flags4 = new Flag(game, {
-            //     id: "flags4",
-            //     x0: 10 * 96 + 48,
-            //     y0: 46 * 96 + 48
-            // }).create();
-            // this.flags.flags5 = new Flag(game, {
-            //     id: "flags5",
-            //     x0: 13 * 96 + 48,
-            //     y0: 26 * 96 + 48
-            // }).create();
-            // this.flags.flags6 = new Flag(game, {
-            //     id: "flags6",
-            //     x0: 27 * 96 + 48,
-            //     y0: 28 * 96 + 48
-            // }).create();
-            // this.flags.flags7 = new Flag(game, {
-            //     id: "flags7",
-            //     x0: 17 * 96 + 48,
-            //     y0: 42 * 96 + 48
-            // }).create();
-            // this.flags.flags8 = new Flag(game, {
-            //     id: "flags8",
-            //     x0: 35 * 96 + 48,
-            //     y0: 18 * 96 + 48
-            // }).create();
-            // this.flags.flags9 = new Flag(game, {
-            //     id: "flags9",
-            //     x0: 5 * 96 + 48,
-            //     y0: 23 * 96 + 48
-            // }).create();
-            // this.flags.flags10 = new Flag(game, {
-            //     id: "flags10",
-            //     x0: 30 * 96 + 48,
-            //     y0: 33 * 96 + 48,
-            //     doubleValue: true
-            // }).create();
+            this.flags.flags2 = new Flag(game, {
+                id: "flags2",
+                x0: 30 * 96 + 48,
+                y0: 14 * 96 + 48
+            }).create();
+            this.flags.flags3 = new Flag(game, {
+                id: "flags3",
+                x0: 36 * 96 + 48,
+                y0: 49 * 96 + 48
+            }).create();
+            this.flags.flags4 = new Flag(game, {
+                id: "flags4",
+                x0: 10 * 96 + 48,
+                y0: 46 * 96 + 48
+            }).create();
+            this.flags.flags5 = new Flag(game, {
+                id: "flags5",
+                x0: 13 * 96 + 48,
+                y0: 26 * 96 + 48
+            }).create();
+            this.flags.flags6 = new Flag(game, {
+                id: "flags6",
+                x0: 27 * 96 + 48,
+                y0: 28 * 96 + 48
+            }).create();
+            this.flags.flags7 = new Flag(game, {
+                id: "flags7",
+                x0: 17 * 96 + 48,
+                y0: 42 * 96 + 48
+            }).create();
+            this.flags.flags8 = new Flag(game, {
+                id: "flags8",
+                x0: 35 * 96 + 48,
+                y0: 18 * 96 + 48
+            }).create();
+            this.flags.flags9 = new Flag(game, {
+                id: "flags9",
+                x0: 5 * 96 + 48,
+                y0: 23 * 96 + 48
+            }).create();
+            this.flags.flags10 = new Flag(game, {
+                id: "flags10",
+                x0: 30 * 96 + 48,
+                y0: 33 * 96 + 48,
+                doubleValue: true
+            }).create();
 
             self.smokes = {};
 
