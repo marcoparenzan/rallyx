@@ -3,10 +3,6 @@ define([], function () {
         var self = this;
         self.id = config.id;
 
-        self.preload = function () {
-            return self;
-        };
-
         self.create = function () {
             self.sprite = game.add.sprite(config.x0, config.y0, "smoke");
 

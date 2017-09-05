@@ -1,10 +1,6 @@
 define([], function () {
     return function (game, config) {
         var self = this;
-        
-        self.preload = function () {
-            return self;
-        };
 
         self.create = function () {
             return self.show(config.x0, config.y0, config.type);
@@ -32,7 +28,13 @@ define([], function () {
         self.update = function(map, layer) {
             return self;
         };
-
+                
+        self.delete = function() {
+            if (self.sprite === undefined) return;
+            self.sprite.destroy();
+            self.sprite = undefined;
+        };
+        
         return self;
     };
 });

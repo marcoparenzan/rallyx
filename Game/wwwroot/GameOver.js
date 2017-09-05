@@ -1,13 +1,8 @@
 define([], function () {
     return function (game, config) {
         var self = this;
-        
-        self.preload = function () {
-            return self;
-        };
 
         self.create = function () {
-            return self.show(config.x0, config.y0);
         };
 
         self.show = function (x, y) {

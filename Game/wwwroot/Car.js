@@ -21,17 +21,12 @@ define([], function () {
             };
         }
 
-        self.preload = function () {
-            game.load.spritesheet("car" + config.id, "assets/car-spritesheet.png", 64, 64);
-            return self;
-        };
-
         self.create = function () {
 
             var typeIndex = (config.type || 0) * 12;
 
             // adding the hero sprite
-            self.sprite = game.add.sprite(config.x0, config.y0, "car" + config.id);
+            self.sprite = game.add.sprite(config.x0, config.y0, "car");
 
             var frameRate = 20;
 

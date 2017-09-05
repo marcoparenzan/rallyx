@@ -3,10 +3,6 @@ define([], function () {
         var self = this;
         self.id = config.id;
 
-        self.preload = function () {
-            return self;
-        };
-
         self.create = function () {
             return self.show(config.x0, config.y0, config.type);
         };
@@ -61,7 +57,7 @@ define([], function () {
 
         self.catch = function(value, double) {
             self.sprite.animations.play(value + (double == true ? "x2" : ""));
-            self.sprite.body.enable = false;
+            self.dontCollide = true;
         };
                   
         self.update = function(map, layer) {
