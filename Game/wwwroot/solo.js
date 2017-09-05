@@ -1,6 +1,6 @@
-define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], function (gameOptions, Car, GameOver, Flag, Rock, Smoke, Hud) {
+define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], function(gameOptions, Car, GameOver, Flag, Rock, Smoke, Hud) {
 
-    var forall = function (self, callback) {
+    var forall = function(self, callback) {
         if (self === undefined) return self;
         var keys = Object.keys(self);
         var i = 0;
@@ -12,7 +12,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
         return self;
     };
 
-    var collisionAmong = function (self, set, callback) {
+    var collisionAmong = function(self, set, callback) {
         if (self === undefined) return self;
         if (self.dontCollide === true) return self;
         var keys = Object.keys(set);
@@ -25,7 +25,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             i++; // advance immediatly as I don't need to reference it again
             if (item.dontCollide === true) continue; // check if no collision is requested
             if (item.sprite !== undefined) {
-                game.physics.arcade.collide(self.sprite, item.sprite, function (selfsprite, itemsprite) {
+                game.physics.arcade.collide(self.sprite, item.sprite, function(selfsprite, itemsprite) {
                     callback(self, this); // this === item
                     exit = true;
                 }, null, item);
@@ -34,9 +34,9 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
         return self;
     };
 
-    return function (game) {
+    return function(game) {
 
-        this.preload = function () {
+        this.preload = function() {
             game.load.tilemap("default", 'assets/rallyx-map.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image("default", "assets/rallyx-map-tileset.png");
 
@@ -50,7 +50,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             game.load.spritesheet("gameover", "assets/gameover-spritesheet.png", 64, 64);
         };
 
-        this.create = function () {
+        this.create = function() {
             var self = this;
 
             // creatin of "level" tilemap
@@ -74,20 +74,20 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }).create();
             self.hud.create();
 
-            game.input.onUp.add(function (e) {
+            game.input.onUp.add(function(e) {
                 if (self.targetPlayerTile == undefined) return;
                 self.targetPlayerTile = undefined;
             });
 
-            game.input.onHold.add(function (e) {
+            game.input.onHold.add(function(e) {
                 self.targetPlayerTile = self.getTile(game.input.worldX, game.input.worldY);
             });
 
-            game.input.onDown.add(function (e) {
+            game.input.onDown.add(function(e) {
                 self.targetPlayerTile = self.getTile(game.input.worldX, game.input.worldY);
             }, self);
 
-            game.input.keyboard.onDownCallback = function (ev) {
+            game.input.keyboard.onDownCallback = function(ev) {
                 switch (ev.keyCode) {
                     case 37:
                         self.playerToLeft = true;
@@ -107,7 +107,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
                 }
             };
 
-            game.input.keyboard.onUpCallback = function (ev) {
+            game.input.keyboard.onUpCallback = function(ev) {
                 switch (ev.keyCode) {
                     case 37:
                         self.playerToLeft = false;
@@ -132,11 +132,11 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             });
         };
 
-        this.getTile = function (x, y) {
+        this.getTile = function(x, y) {
             return this.map.getTileWorldXY(x, y, this.map.tileWidth, this.map.tileHeight, this.layer);
         };
 
-        this.startRound = function (args) {
+        this.startRound = function(args) {
             var self = this;
             self.round = args.round;
             self.hud.round(self.round);
@@ -257,7 +257,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             self.restart();
         };
 
-        this.restart = function () {
+        this.restart = function() {
             var self = this;
 
             self.targetPlayerTile = undefined;
@@ -278,36 +278,38 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
 
             self.smokecounter = 2;
             self.playerSmokingCount = undefined;
-            forall(self.smokes, function (smoke) {
+            forall(self.smokes, function(smoke) {
                 smoke.delete();
             });
 
             self.player.reset();
-            forall(self.enemies, function (car) {
+            forall(self.enemies, function(car) {
                 car.reset();
             });
 
-            self.scheduleTask(function () {
+            self.scheduleTask(function() {
                 var self = this;
                 self.continue(2000);
                 self.player.up();
             }, 2000);
         };
 
-        this.catchTheFlag = function (flag) {
+        this.catchTheFlag = function(flag) {
             var self = this;
             self.suspend();
             if (flag.doubleValue()) {
                 self.multiplyFlagScore = 2;
             }
             self.player.addScore(self.nextFlagScore * self.multiplyFlagScore);
-            flag.catch(self.nextFlagScore, self.multiplyFlagScore === 2);
-            if (Object.keys(self.flags).length === 0) {
+            if (Object.keys(self.flags).length === 1) {
+                // because the delay due to the scheduled remove of the sprite, I check for 1, not 0.
                 self.nextRound();
             } else {
+                // so here I remove the sprite. If done before, I should support 1 or 0 (not reliable)
+                flag.catch(self.nextFlagScore, self.multiplyFlagScore === 2);
 
-                self.scheduleTask(function (args) {
-                    delete self.flags[flag.id]; 
+                self.scheduleTask(function(args) {
+                    delete self.flags[flag.id];
                     args.flag.delete();
                 }, 3000, {
                     flag: flag
@@ -318,7 +320,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
         };
 
-        this.explosion = function () {
+        this.explosion = function() {
             var self = this;
             self.completeTasks();
             self.suspend();
@@ -332,7 +334,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
         };
 
-        this.gameover = function () {
+        this.gameover = function() {
             var self = this;
             self.suspend();
             self.gameOver.show(self.player.sprite.x, self.player.sprite.y);
@@ -341,7 +343,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             self.completegameover = true;
         };
 
-        this.gameover2 = function () {
+        this.gameover2 = function() {
             var self = this;
             if (self.player.fuel > 0) {
                 self.player.addScore(10);
@@ -352,7 +354,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
         };
 
-        this.nextRound = function () {
+        this.nextRound = function() {
             var self = this;
             self.suspend();
             self.completeTasks();
@@ -360,7 +362,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             //self.delete();
         };
 
-        this.nextRound2 = function () {
+        this.nextRound2 = function() {
             var self = this;
             if (self.player.fuel > 0) {
                 self.player.addScore(10);
@@ -373,21 +375,21 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
         };
 
-        this.delete = function () {
+        this.delete = function() {
             var self = this;
-            forall(self.enemies, function (item) {
+            forall(self.enemies, function(item) {
                 item.delete();
             });
             self.enemies = {};
-            forall(self.flags, function (item) {
+            forall(self.flags, function(item) {
                 item.delete();
             });
             self.flags = {};
-            forall(self.rocks, function (item) {
+            forall(self.rocks, function(item) {
                 item.delete();
             });
             self.rocks = {};
-            forall(self.smokes, function (item) {
+            forall(self.smokes, function(item) {
                 item.delete();
             });
             self.smokes = {};
@@ -398,27 +400,27 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
         };
 
-        this.goToTitle = function () {
+        this.goToTitle = function() {
             game.state.start("title");
         };
 
-        this.suspend = function () {
+        this.suspend = function() {
             var self = this;
 
             self.player.suspend();
-            forall(this.enemies, function (car) {
+            forall(this.enemies, function(car) {
                 car.suspend();
             });
         };
 
-        this.enemiesContinues = function () {
+        this.enemiesContinues = function() {
             var self = this;
-            forall(self.enemies, function (car) {
+            forall(self.enemies, function(car) {
                 car.continue();
             });
         };
 
-        this.continue = function (enemiesDelayedBy) {
+        this.continue = function(enemiesDelayedBy) {
             var self = this;
             self.player.continue();
             if (enemiesDelayedBy !== undefined) {
@@ -428,7 +430,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
         };
 
-        this.render = function () {
+        this.render = function() {
             var self = this;
             self.hud
                 .render()
@@ -437,16 +439,16 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
                 .fuel(self.player.fuel)
                 .lives(self.player.lives)
                 .location(self.getTile(self.player.sprite.x, self.player.sprite.y), 0xffffff, 0, 240);
-            forall(self.enemies, function (enemy) {
+            forall(self.enemies, function(enemy) {
                 self.hud.location(self.getTile(enemy.sprite.x, enemy.sprite.y), 0xff0000, 0, 240);
             });
-            forall(self.flags, function (flag) {
+            forall(self.flags, function(flag) {
                 self.hud.location(self.getTile(flag.sprite.x, flag.sprite.y), 0xff0000, 0, 240);
             });
             return self;
         };
 
-        this.update = function () {
+        this.update = function() {
             var self = this;
 
             self.updateTasks();
@@ -471,7 +473,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
                 self.explosion();
             }
 
-            forall(self.enemies, function (enemy) {
+            forall(self.enemies, function(enemy) {
                 enemy.update(self.map, self.layer);
             });
 
@@ -494,7 +496,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
 
             var playerTile = self.player.getTile(self.map, self.layer);
-            forall(this.enemies, function (car) {
+            forall(this.enemies, function(car) {
                 car.follow(playerTile, self.map, self.layer);
             });
 
@@ -520,7 +522,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
                     }).create();
                     self.smokes[smoke.id] = smoke;
 
-                    self.scheduleTask(function (args) {
+                    self.scheduleTask(function(args) {
                         var self = this;
                         args.smoke.delete();
                         delete self.smokes[args.smokeId];
@@ -540,20 +542,20 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
 
             // player to enemy collision
-            collisionAmong(self.player, self.enemies, function (player, enemy) {
+            collisionAmong(self.player, self.enemies, function(player, enemy) {
                 self.explosion();
             });
 
-            collisionAmong(self.player, self.flags, function (player, flag) {
+            collisionAmong(self.player, self.flags, function(player, flag) {
                 self.catchTheFlag(flag);
                 // enemies pass over flag....
             });
 
-            collisionAmong(self.player, self.rocks, function (player, rock) {
+            collisionAmong(self.player, self.rocks, function(player, rock) {
                 self.explosion();
             });
 
-            forall(self.enemies, function (enemy) {
+            forall(self.enemies, function(enemy) {
 
                 // 09.02 - enemies does not collide each other
                 // collisionAmong(enemy, self.enemies, function (enemy1, enemy2) {
@@ -562,15 +564,15 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
                 //     enemy2.reverse();
                 // });
 
-                collisionAmong(enemy, self.rocks, function (enemy, rock) {
+                collisionAmong(enemy, self.rocks, function(enemy, rock) {
                     enemy.reverse(); // enemies does not explode over rocks, just reverse
                 });
 
-                collisionAmong(enemy, self.smokes, function (enemy, smoke) {
+                collisionAmong(enemy, self.smokes, function(enemy, smoke) {
                     var direction = enemy.direction();
                     enemy.smoked();
                     // crash
-                    self.scheduleTask(function (args) {
+                    self.scheduleTask(function(args) {
                         args.enemy.continue(args.direction);
                     }, 2500, {
                         enemy: enemy,
@@ -586,7 +588,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
         };
 
         this.scheduledTasks = [];
-        this.scheduleTask = function (task, delay, taskArgs) {
+        this.scheduleTask = function(task, delay, taskArgs) {
             var self = this;
             self.scheduledTasks.push({
                 runAfter: game.time.time + delay,
@@ -595,7 +597,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             });
         };
 
-        this.runTask = function (task) {
+        this.runTask = function(task) {
             var self = this;
             if (typeof task.task === "string") {
                 self[task.task](task.args);
@@ -604,7 +606,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
         };
 
-        this.completeTasks = function () {
+        this.completeTasks = function() {
             var self = this;
             while (self.scheduledTasks.length > 0) {
                 var task = self.scheduledTasks[0];
@@ -613,7 +615,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
         };
 
-        this.updateTasks = function () {
+        this.updateTasks = function() {
             var self = this;
             if (self.scheduledTasks.length == 0) return;
             for (var i = self.scheduledTasks.length - 1; i >= 0; i--) {
