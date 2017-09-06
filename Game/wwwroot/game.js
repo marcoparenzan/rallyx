@@ -10,6 +10,7 @@ requirejs([
 ) {
     game = new Phaser.Game(1280, 960, Phaser.CANVAS, "Rally-X");
     var highScore;
+    var highScoreRound;
 
     var setCookie = function(cname, cvalue, exdays) {
         var d = new Date();
@@ -42,6 +43,7 @@ requirejs([
 
         this.init = function (args) {
             highScore = getCookie("highScore") || 0;
+            highScoreRound = getCookie("highScoreRound") || 0;
         };
 
         this.preload = function () {
@@ -61,7 +63,8 @@ requirejs([
             // starting ARCADE physics
             game.physics.startSystem(Phaser.Physics.ARCADE);
             game.state.start("title", true, false, {
-                highScore: highScore
+                highScore: highScore,
+                highScoreRound: highScoreRound
             });
         };
     };
@@ -72,7 +75,9 @@ requirejs([
             if (args.endGame === true) {
                 if (args.score > highScore) {
                     highScore = args.score;
+                    highScoreRound = args.round;
                     setCookie("highScore", highScore);
+                    setCookie("highScoreRound", highScoreRound);
                 }
             }
         };
@@ -83,7 +88,8 @@ requirejs([
 
         this.start = function () {
             game.state.start("solo", true, false, {
-                highScore: highScore
+                highScore: highScore,
+                highScoreRound: highScoreRound
             });
         };
 

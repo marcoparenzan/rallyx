@@ -175,87 +175,56 @@ define(["car", "gameover", "flag", "rock", "smoke", "hud"], function(Car, GameOv
                 }).create();
             }
 
+            var randomXY = function() {
+                var x0;
+                var y0;
+
+                // calculate random xy until correct
+                while(true) {
+                    x0 = parseInt(Math.random()*42-10);
+                    y0 = parseInt(Math.random()*64-10);
+                    // exclusion condition outside 5,4 - 36-59
+                    if (x0<5) continue;
+                    if (x0>36) continue;
+                    if (y0<4) continue;
+                    if (y0>59) continue;
+                    // exclusion condition in the starting rectangle 13,49 28,59
+                    if (x0>=13 && x0<=28 && y0>=49 && y0<=59) continue;
+                    // exclusion if tile not empty
+                    var tile = self.map.getTile(x0, y0);
+                    if (tile.index > 1) continue;
+                    // and if not already something else...
+                    // to do
+                    break;
+                }
+                return { x0: x0, y0:y0 };
+            };
+
             self.flags = {};
-            self.flags.flags1 = new Flag(game, {
-                id: "flags1",
-                x0: 20 * 96 + 48,
-                y0: 50 * 96 + 48
-            }).create();
-            this.flags.flags2 = new Flag(game, {
-                id: "flags2",
-                x0: 30 * 96 + 48,
-                y0: 14 * 96 + 48
-            }).create();
-            this.flags.flags3 = new Flag(game, {
-                id: "flags3",
-                x0: 36 * 96 + 48,
-                y0: 49 * 96 + 48
-            }).create();
-            this.flags.flags4 = new Flag(game, {
-                id: "flags4",
-                x0: 10 * 96 + 48,
-                y0: 46 * 96 + 48
-            }).create();
-            this.flags.flags5 = new Flag(game, {
-                id: "flags5",
-                x0: 13 * 96 + 48,
-                y0: 26 * 96 + 48
-            }).create();
-            this.flags.flags6 = new Flag(game, {
-                id: "flags6",
-                x0: 27 * 96 + 48,
-                y0: 28 * 96 + 48
-            }).create();
-            this.flags.flags7 = new Flag(game, {
-                id: "flags7",
-                x0: 17 * 96 + 48,
-                y0: 42 * 96 + 48
-            }).create();
-            this.flags.flags8 = new Flag(game, {
-                id: "flags8",
-                x0: 35 * 96 + 48,
-                y0: 18 * 96 + 48
-            }).create();
-            this.flags.flags9 = new Flag(game, {
-                id: "flags9",
-                x0: 5 * 96 + 48,
-                y0: 23 * 96 + 48
-            }).create();
-            this.flags.flags10 = new Flag(game, {
-                id: "flags10",
-                x0: 30 * 96 + 48,
-                y0: 33 * 96 + 48,
-                doubleValue: true
-            }).create();
+            for(var i = 1; i<=10; i++) {
+                var xy = randomXY();
+                var id = "flag" + i;
+                var doubleValue = i === 10 ? true : false;
+                self.flags[id] = new Flag(game, {
+                    id: id,
+                    x0: xy.x0 * 96 + 48,
+                    y0: xy.y0 * 96 + 48,
+                    doubleValue: doubleValue
+                }).create();
+            }
 
             self.smokes = {};
 
             this.rocks = {};
-            self.rocks.rock1 = new Rock(game, {
-                id: "rock1",
-                x0: 12 * 96 + 48,
-                y0: 4 * 96 + 48
-            }).create();
-            self.rocks.rock2 = new Rock(game, {
-                id: "rock2",
-                x0: 27 * 96 + 48,
-                y0: 31 * 96 + 48
-            }).create();
-            self.rocks.rock3 = new Rock(game, {
-                id: "rock3",
-                x0: 36 * 96 + 48,
-                y0: 43 * 96 + 48
-            }).create();
-            self.rocks.rock4 = new Rock(game, {
-                id: "rock4",
-                x0: 15 * 96 + 48,
-                y0: 22 * 96 + 48
-            }).create();
-            self.rocks.rock5 = new Rock(game, {
-                id: "rock5",
-                x0: 26 * 96 + 48,
-                y0: 47 * 96 + 48
-            }).create();
+            for(var i = 1; i<=5; i++) {
+                var xy = randomXY();
+                var id = "rock" + i;
+                self.rocks[id] = new Rock(game, {
+                    id: id,
+                    x0: xy.x0 * 96 + 48,
+                    y0: xy.y0 * 96 + 48
+                }).create();
+            }
 
             game.world.sort();
 
@@ -355,6 +324,7 @@ define(["car", "gameover", "flag", "rock", "smoke", "hud"], function(Car, GameOv
                 self.player.fuel--;
             } else if (self.scheduleGoToTitle === undefined) {
                 self.scheduleTask("goToTitle", 2000, {
+                    round: self.round,
                     score: self.player.score
                 });
                 self.scheduleGoToTitle = true; // so it always falls out after that
@@ -415,7 +385,8 @@ define(["car", "gameover", "flag", "rock", "smoke", "hud"], function(Car, GameOv
             }
             game.state.start("title", true, false, {
                 endGame: true,                
-                score: args.score
+                score: args.score,
+                round: args.round
             });
         };
 
@@ -524,6 +495,7 @@ define(["car", "gameover", "flag", "rock", "smoke", "hud"], function(Car, GameOv
             // track when player changes tile
             var newPlayerTile = false;
             if (self.lastPlayerTile === undefined) newPlayerTile = true;
+            else if (self.playerTile === undefined) newPlayerTile = true;
             else if (self.lastPlayerTile.x !== playerTile.x || self.lastPlayerTile.y !== playerTile.y) newPlayerTile = true;
 
             if (newPlayerTile === true) {
