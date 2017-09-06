@@ -1,4 +1,4 @@
-define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], function(gameOptions, Car, GameOver, Flag, Rock, Smoke, Hud) {
+define(["car", "gameover", "flag", "rock", "smoke", "hud"], function(Car, GameOver, Flag, Rock, Smoke, Hud) {
 
     var forall = function(self, callback) {
         if (self === undefined) return self;
@@ -36,6 +36,13 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
 
     return function(game) {
 
+        this.init = function(args) {
+            var self = this;
+            if (args !== undefined) {
+                self.highScore = args.highScore || 0;
+            }
+        };
+
         this.preload = function() {
             game.load.tilemap("default", 'assets/rallyx-map.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image("default", "assets/rallyx-map-tileset.png");
@@ -65,12 +72,9 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             // set workd bounds to allow camera to follow the player
             game.world.setBounds(0, 0, 1008 * 4, 1536 * 4);
 
-            this.gameOver = new GameOver(game).create();
-
             this.hud = new Hud(game, {
                 x0: 1088,
-                y0: 0,
-                highScore: gameOptions.highScore
+                y0: 0
             }).create();
             self.hud.create();
 
@@ -128,7 +132,8 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             };
 
             self.startRound({
-                round: 1
+                round: 1,
+                score: 0
             });
         };
 
@@ -148,7 +153,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
                 x0: 20 * 96 + 48,
                 y0: 54 * 96 + 48,
                 speed: 400,
-                initialScore: 0,
+                initialScore: args.score,
                 initialLives: 3,
                 initialFuel: 100,
                 type: 2
@@ -337,7 +342,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
         this.gameover = function() {
             var self = this;
             self.suspend();
-            self.gameOver.show(self.player.sprite.x, self.player.sprite.y);
+            self.gameOver = new GameOver(game).create(self.player.sprite.x, self.player.sprite.y);            
             self.completeTasks();
             //self.delete();
             self.completegameover = true;
@@ -349,7 +354,9 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
                 self.player.addScore(10);
                 self.player.fuel--;
             } else if (self.scheduleGoToTitle === undefined) {
-                self.scheduleTask("goToTitle", 2000);
+                self.scheduleTask("goToTitle", 2000, {
+                    score: self.player.score
+                });
                 self.scheduleGoToTitle = true; // so it always falls out after that
             }
         };
@@ -369,7 +376,8 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
                 self.player.fuel--;
             } else if (self.scheduleStartRound === undefined) {
                 self.scheduleTask("startRound", 2000, {
-                    round: self.round + 1
+                    round: self.round + 1,
+                    score: self.player.score
                 });
                 self.scheduleStartRound = true; // so it always falls out after that
             }
@@ -400,8 +408,14 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             }
         };
 
-        this.goToTitle = function() {
-            game.state.start("title");
+        this.goToTitle = function(args) {
+            if (self.gameOver !== undefined) {
+                self.gameOver.delete();
+                self.gameOver = undefined;
+            }
+            game.state.start("title", true, false, {
+                score: args.score
+            });
         };
 
         this.suspend = function() {
@@ -435,6 +449,7 @@ define(["gameOptions", "car", "gameover", "flag", "rock", "smoke", "hud"], funct
             self.hud
                 .render()
                 .round(self.round)
+                .highScore(self.highScore)
                 .score(self.player.score)
                 .fuel(self.player.fuel)
                 .lives(self.player.lives)

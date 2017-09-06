@@ -86,13 +86,19 @@ define([], function () {
             var self = this;
             self.hudRoundText.text = round;
             return self;
-        }
+        };
 
         this.score = function(score) {
             var self = this;
-            self.hudScoreText.text = score;
+            self.hudScoreText.text = score || 0;
             return self;
-        }
+        };
+
+        this.highScore = function(highScore) {
+            var self = this;
+            self.hudHighScoreText.text = highScore || 0;
+            return self;
+        };
 
         return this;
     };

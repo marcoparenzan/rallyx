@@ -2,10 +2,7 @@ define([], function () {
     return function (game, config) {
         var self = this;
 
-        self.create = function () {
-        };
-
-        self.show = function (x, y) {
+        self.create = function (x, y) {
             self.sprite = game.add.sprite(x, y, "gameover");
 
             var frameRate = 20;
@@ -17,10 +14,6 @@ define([], function () {
 
             self.sprite.animations.play("default");
             
-            return self;
-        };
-        
-        self.update = function(map, layer) {
             return self;
         };
 

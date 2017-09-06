@@ -4,14 +4,15 @@ requirejs.config({
 });
 
 requirejs([
-    "gameOptions",
     "solo",
-], function (gameOptions,
+], function (
     Solo
 ) {
-    game = new Phaser.Game(gameOptions.gameWidth, gameOptions.gameHeight, Phaser.CANVAS, "Rally-X");
+    game = new Phaser.Game(1280, 960, Phaser.CANVAS, "Rally-X");
+    var highScore;
 
     var Init = function (game) {
+
         this.preload = function () {
             game.scale.pageAlignHorizontally = true;
             game.scale.pageAlignVertically = true;
@@ -34,12 +35,25 @@ requirejs([
 
     var Title = function (game) {
 
+        this.init = function (args) {
+            if (args !== undefined) {
+                if (highScore !== undefined) {
+                    if (highScore < args.score) highScore = args.score;
+                }
+                else {
+                    highScore = args.score;
+                }
+            }
+        };
+
         this.preload = function () {
             game.load.image("title", "assets/title.png");
         };
 
         this.start = function () {
-            game.state.start("solo");
+            game.state.start("solo", true, false, {
+                highScore: highScore
+            });
         };
 
         this.create = function () {
