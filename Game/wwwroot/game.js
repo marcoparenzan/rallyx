@@ -11,7 +11,38 @@ requirejs([
     game = new Phaser.Game(1280, 960, Phaser.CANVAS, "Rally-X");
     var highScore;
 
+    var setCookie = function(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + ((exdays || 365)*24*60*60*1000));
+        var expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    };
+
+    var getCookie = function(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    };
+
+    var deleteCookie = function(cname) {
+        setCookie(cname,"",-1);
+    };
+
     var Init = function (game) {
+
+        this.init = function (args) {
+            highScore = getCookie("highScore") || 0;
+        };
 
         this.preload = function () {
             game.scale.pageAlignHorizontally = true;
@@ -29,19 +60,19 @@ requirejs([
 
             // starting ARCADE physics
             game.physics.startSystem(Phaser.Physics.ARCADE);
-            game.state.start("title");
+            game.state.start("title", true, false, {
+                highScore: highScore
+            });
         };
     };
 
     var Title = function (game) {
 
         this.init = function (args) {
-            if (args !== undefined) {
-                if (highScore !== undefined) {
-                    if (highScore < args.score) highScore = args.score;
-                }
-                else {
+            if (args.endGame === true) {
+                if (args.score > highScore) {
                     highScore = args.score;
+                    setCookie("highScore", highScore);
                 }
             }
         };

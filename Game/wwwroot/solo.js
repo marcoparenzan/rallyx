@@ -414,6 +414,7 @@ define(["car", "gameover", "flag", "rock", "smoke", "hud"], function(Car, GameOv
                 self.gameOver = undefined;
             }
             game.state.start("title", true, false, {
+                endGame: true,                
                 score: args.score
             });
         };
