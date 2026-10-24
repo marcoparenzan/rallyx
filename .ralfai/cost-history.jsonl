@@ -1,0 +1,2 @@
+{"Timestamp":"2026-10-22T18:12:44.0767263+00:00","Provider":"foundry","ModelId":"gpt-6.1-sol","InputTokens":197195,"OutputTokens":7263,"TotalTokens":204458,"EstimatedCostUsd":null,"DurationSeconds":118.7799155}
+{"Timestamp":"2026-10-22T18:21:54.3119152+00:00","Provider":"foundry","ModelId":"gpt-6.1-sol","InputTokens":382813,"OutputTokens":5981,"TotalTokens":388794,"EstimatedCostUsd":null,"DurationSeconds":100.6166039}
